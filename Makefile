@@ -1,9 +1,10 @@
 LD=-L./lib/ -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
+SRC=src/*.c
 
 .PHONY: main
 main:
-	${CC} src/main.c -O1 -Wall -std=c99 -Wno-missing-braces -I ./include/ ${LD}
+	${CC} ${SRC} -O1 -Wall -std=c99 -Wno-missing-braces -I ./include/ ${LD}
 	./a.out
 
 setup-raylib:
