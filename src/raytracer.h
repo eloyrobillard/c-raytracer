@@ -25,6 +25,5 @@ typedef struct {
   int num_objects;
 } World;
 
-void trace_rays(int screenWidth, int screenHeight, const Vec3 *origin,
-                World *world);
+void trace_rays(int screenWidth, int screenHeight, const Vec3 *origin, World *world);
 #endif
