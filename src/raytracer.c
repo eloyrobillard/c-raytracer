@@ -32,8 +32,8 @@ bool intersects_with_sphere(const Vec3 *v, Object *sphere) {
     return false;
 
   double sqrt_delta = sqrt(delta);
-  double x1 = (dot_cv - sqrt_delta) / mag_sqr_v;
-  double x2 = (dot_cv + sqrt_delta) / mag_sqr_v;
+  double x1 = (2 * dot_cv - sqrt_delta) / 2 * mag_sqr_v;
+  double x2 = (2 * dot_cv + sqrt_delta) / 2 * mag_sqr_v;
 
   return x1 > 0 || x2 > 0;
 }
