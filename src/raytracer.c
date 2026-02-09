@@ -12,20 +12,25 @@ double vec3_dot(const Vec3 *v1, const Vec3 *v2) { return v1->x * v2->x + v1->y *
 
 double vec3_magnitude_squared(const Vec3 *v) { return vec3_dot(v, v); }
 
-bool intersects_with_sphere(const Vec3 *v, Object *sphere) {
+double intersects_with_sphere(const Vec3 *v, Object *sphere) {
   double mag_sqr_v = vec3_magnitude_squared(v);
   double mag_sqr_c = vec3_magnitude_squared(&sphere->pos_center);
   double dot_cv = vec3_dot(v, &sphere->pos_center);
 
   double delta = 4 * dot_cv * dot_cv - 4 * mag_sqr_v * (mag_sqr_c - sphere->radius * sphere->radius);
   if (delta < 0)
-    return false;
+    return INFINITY;
 
   double sqrt_delta = sqrt(delta);
   double x1 = (2 * dot_cv - sqrt_delta) / (2 * mag_sqr_v);
   double x2 = (2 * dot_cv + sqrt_delta) / (2 * mag_sqr_v);
 
-  return x1 > 0 || x2 > 0;
+  if (x1 > 0 && x1 < x2)
+    return x1;
+  else if (x2 > 0)
+    return x2;
+  else
+    return INFINITY;
 }
 
 void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *origin, World *world) {
@@ -34,14 +39,25 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *origin, W
       const Vec3 direction = {.x = x, .y = y, .z = 1};
       const Vec3 v = vec3_difference(&direction, origin);
 
+      double min_lambda = INFINITY;
+      Color color = WHITE;
       for (int obji = 0; obji < world->num_objects; obji++) {
         Object *object = &world->objects[obji];
 
-        if (intersects_with_sphere(&v, object))
-          DrawPixel(x + halfScreenWidth, y + halfScreenHeight, object->color);
-        else
-          break;
+        switch (object->type) {
+        case SPHERE: {
+          double lambda = intersects_with_sphere(&v, object);
+
+          if (lambda < min_lambda) {
+            min_lambda = lambda;
+            color = object->color;
+          }
+        } break;
+        }
       }
+
+      if (min_lambda < INFINITY)
+        DrawPixel(x + halfScreenWidth, y + halfScreenHeight, color);
     }
   }
 }

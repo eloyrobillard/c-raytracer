@@ -17,11 +17,24 @@ int main(int argc, char **argv) {
 
     Vec3 origin = {.x = 0, .y = 0, .z = -1000};
     Object objects[] = {{
-        .pos_center = {.x = 0, .y = 0, .z = 10},
-        .color = RED,
-        .radius = 2,
-    }};
-    World world = {.objects = objects, .num_objects = 1};
+                            .type = SPHERE,
+                            .pos_center = {.x = 0, .y = 0, .z = 10},
+                            .color = RED,
+                            .radius = 2,
+                        },
+                        {
+                            .type = SPHERE,
+                            .pos_center = {.x = -2, .y = -2, .z = 11},
+                            .color = GREEN,
+                            .radius = 1,
+                        },
+                        {
+                            .type = SPHERE,
+                            .pos_center = {.x = 1, .y = 1, .z = 9},
+                            .color = BLUE,
+                            .radius = 1,
+                        }};
+    World world = {.objects = objects, .num_objects = 3};
 
     trace_rays(halfWidth, halfHeight, &origin, &world);
 
