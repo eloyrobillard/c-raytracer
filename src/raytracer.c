@@ -8,11 +8,6 @@ Vec3 vec3_difference(const Vec3 *v1, const Vec3 *v2) {
   return v;
 }
 
-double vec3_distance_squared(const Vec3 *v1, const Vec3 *v2) {
-  const Vec3 diff = vec3_difference(v1, v2);
-  return diff.x * diff.x + diff.y * diff.y + diff.z * diff.z;
-}
-
 double vec3_dot(const Vec3 *v1, const Vec3 *v2) { return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z; }
 
 double vec3_magnitude_squared(const Vec3 *v) { return v->x * v->x + v->y * v->y + v->z * v->z; }
