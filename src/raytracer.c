@@ -28,9 +28,9 @@ bool intersects_with_sphere(const Vec3 *v, Object *sphere) {
   return x1 > 0 || x2 > 0;
 }
 
-void trace_rays(int screenWidth, int screenHeight, const Vec3 *origin, World *world) {
-  for (int x = 0; x < screenWidth; x++) {
-    for (int y = 0; y < screenHeight; y++) {
+void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *origin, World *world) {
+  for (int x = -halfScreenWidth; x < halfScreenWidth; x++) {
+    for (int y = -halfScreenHeight; y < halfScreenHeight; y++) {
       const Vec3 direction = {.x = x, .y = y, .z = 1};
       const Vec3 v = vec3_difference(&direction, origin);
 
@@ -38,7 +38,7 @@ void trace_rays(int screenWidth, int screenHeight, const Vec3 *origin, World *wo
         Object *object = &world->objects[obji];
 
         if (intersects_with_sphere(&v, object))
-          DrawPixel(x, y, object->color);
+          DrawPixel(x + halfScreenWidth, y + halfScreenHeight, object->color);
         else
           break;
       }
