@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
     ClearBackground(RAYWHITE);
 
-    Vec3 origin = {.x = 0, .y = 0, .z = -1000};
+    Vec3 origin = {.x = 0, .y = 0, .z = -screenWidth};
     Object objects[] = {{
                             .type = SPHERE,
                             .pos_center = {.x = 0, .y = 0, .z = 10},
