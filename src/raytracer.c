@@ -10,7 +10,7 @@ Vec3 vec3_difference(const Vec3 *v1, const Vec3 *v2) {
 
 double vec3_dot(const Vec3 *v1, const Vec3 *v2) { return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z; }
 
-double vec3_magnitude_squared(const Vec3 *v) { return v->x * v->x + v->y * v->y + v->z * v->z; }
+double vec3_magnitude_squared(const Vec3 *v) { return vec3_dot(v, v); }
 
 bool intersects_with_sphere(const Vec3 *v, Object *sphere) {
   double mag_sqr_v = vec3_magnitude_squared(v);
