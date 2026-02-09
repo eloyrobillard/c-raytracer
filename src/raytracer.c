@@ -36,18 +36,16 @@ bool intersects_with_sphere(const Vec3 *v, Object *sphere) {
 void trace_rays(int screenWidth, int screenHeight, const Vec3 *origin, World *world) {
   for (int x = 0; x < screenWidth; x++) {
     for (int y = 0; y < screenHeight; y++) {
-      const Vec3 direction = {.x = x, .y = y, .z = 0};
+      const Vec3 direction = {.x = x, .y = y, .z = 1};
       const Vec3 v = vec3_difference(&direction, origin);
 
       for (int obji = 0; obji < world->num_objects; obji++) {
         Object *object = &world->objects[obji];
 
         if (intersects_with_sphere(&v, object))
-          break;
-        else {
-          // printf("%d %d\n", x, y);
           DrawPixel(x, y, object->color);
-        }
+        else
+          break;
       }
     }
   }
