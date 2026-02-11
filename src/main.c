@@ -34,7 +34,10 @@ int main(int argc, char **argv) {
                             .color = BLUE,
                             .radius = 1,
                         }};
-    World world = {.objects = objects, .num_objects = 3};
+
+    Light lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = 0, .z = 0}, .intensity = 50.0}};
+
+    World world = {.objects = objects, .num_objects = 3, .lights = lights, .num_lights = 1};
 
     trace_rays(halfWidth, halfHeight, &origin, &world);
 
