@@ -1,6 +1,7 @@
 #include "raytracer.h"
 #include <math.h>
 #include <raylib.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 int min(int a, int b) { return (a < b) ? a : b; }
@@ -13,6 +14,11 @@ Vec3 vec3_add(const Vec3 *v1, const Vec3 *v2) {
 Vec3 vec3_difference(const Vec3 *v1, const Vec3 *v2) {
   Vec3 v = {.x = v1->x - v2->x, .y = v1->y - v2->y, .z = v1->z - v2->z};
   return v;
+}
+
+bool vec3_equal(const Vec3 *v1, const Vec3 *v2) { return (v1->x == v2->x) && (v1->y == v2->y) && (v1->z == v2->z); }
+bool vec3_equal_with_error_margin(const Vec3 *v1, const Vec3 *v2, double margin) {
+  return (v1->x - v2->x < margin) && (v1->y - v2->y < margin) && (v1->z - v2->z < margin);
 }
 
 double vec3_dot(const Vec3 *v1, const Vec3 *v2) { return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z; }
@@ -33,7 +39,7 @@ double vec3_magnitude(const Vec3 *v) { return sqrt(vec3_magnitude_squared(v)); }
 
 Vec3 normalized(const Vec3 *v) { return vec3_scalar_div(v, vec3_magnitude(v)); }
 
-double intersects_with_sphere(const Vec3 *v, Object *sphere) {
+double intersects_with_sphere(const Vec3 *origin, const Vec3 *v, Object *sphere) {
   double mag_sqr_v = vec3_magnitude_squared(v);
   double mag_sqr_c = vec3_magnitude_squared(&sphere->pos_center);
   double dot_cv = vec3_dot(v, &sphere->pos_center);
@@ -68,16 +74,19 @@ double get_light_intensity_at_point(const Vec3 *point, Object *obj, Light **ligh
   // point across a normal vector, we will find a point on that line
   // twice as far from the origin as the projection of the origin on our normal vector.
   const Vec3 tip_ligth_vec = vec3_scalar_mul(&projection_origin_on_normal, 2);
-  const Vec3 light_vec = vec3_difference(&tip_ligth_vec, point);
-  const Vec3 light_vec_normalized = normalized(&light_vec);
+  const Vec3 possible_light_vec = vec3_difference(&tip_ligth_vec, point);
+  const Vec3 possible_light_vec_normalized = normalized(&possible_light_vec);
 
   double total_intensity = 0.0;
   for (int i = 0; i < num_lights; i++) {
     Light *light = lights[i];
     switch (light->type) {
-    case DIRECTIONAL:
-      total_intensity += light->intensity;
+    case DIRECTIONAL: {
+      const Vec3 light_vec_normalized = normalized(&light->direction);
+      if (vec3_equal_with_error_margin(&light_vec_normalized, &possible_light_vec_normalized, 1.55))
+        total_intensity += light->intensity;
       break;
+    }
     }
   }
 
@@ -98,7 +107,7 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *origin, W
 
         switch (object->type) {
         case SPHERE: {
-          double lambda = intersects_with_sphere(&v, object);
+          double lambda = intersects_with_sphere(origin, &v, object);
 
           if (lambda < min_lambda) {
             min_lambda = lambda;
