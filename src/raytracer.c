@@ -5,6 +5,9 @@
 #include <stdio.h>
 
 int min(int a, int b) { return (a < b) ? a : b; }
+double absf(double a) { return a < 0 ? -a : a; };
+
+void print_vec3(const Vec3 *v) { printf("x: %f y: %f z: %f\n", v->x, v->y, v->z); }
 
 Vec3 vec3_add(const Vec3 *v1, const Vec3 *v2) {
   Vec3 v = {.x = v1->x + v2->x, .y = v1->y + v2->y, .z = v1->z + v2->z};
@@ -18,7 +21,7 @@ Vec3 vec3_difference(const Vec3 *v1, const Vec3 *v2) {
 
 bool vec3_equal(const Vec3 *v1, const Vec3 *v2) { return (v1->x == v2->x) && (v1->y == v2->y) && (v1->z == v2->z); }
 bool vec3_equal_with_error_margin(const Vec3 *v1, const Vec3 *v2, double margin) {
-  return (v1->x - v2->x < margin) && (v1->y - v2->y < margin) && (v1->z - v2->z < margin);
+  return (absf(v1->x - v2->x) <= margin) && (absf(v1->y - v2->y) <= margin) && (absf(v1->z - v2->z) <= margin);
 }
 
 double vec3_dot(const Vec3 *v1, const Vec3 *v2) { return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z; }
@@ -60,37 +63,35 @@ double intersects_with_sphere(const Vec3 *origin, const Vec3 *v, Object *sphere)
     return INFINITY;
 }
 
-double get_light_intensity_at_point(const Vec3 *point, Object *obj, Light **lights, int num_lights) {
+bool does_light_bounce_towards_origin(const Vec3 *origin, const Vec3 *point, const Object *obj, const Light *light) {
   const Vec3 normal = vec3_difference(&obj->pos_center, point);
   const Vec3 unit_normal = normalized(&normal);
 
-  // NOTE: Vec3 representing point has direction inverse to normal
-  // Negate dot product to make things easier later on
-  const double dot_pn = -vec3_dot(point, &unit_normal);
-  const Vec3 dotted_normal = vec3_scalar_mul(&unit_normal, dot_pn);
+  // TODO: don't normalize every time
+  const Vec3 light_normalized = normalized(&light->direction);
 
-  const Vec3 projection_origin_on_normal = vec3_add(point, &dotted_normal);
-  // NOTE: Since we look for a light vector through the "reflection" the line from origin to point
-  // point across a normal vector, we will find a point on that line
-  // twice as far from the origin as the projection of the origin on our normal vector.
-  const Vec3 tip_ligth_vec = vec3_scalar_mul(&projection_origin_on_normal, 2);
-  const Vec3 possible_light_vec = vec3_difference(&tip_ligth_vec, point);
-  const Vec3 possible_light_vec_normalized = normalized(&possible_light_vec);
+  // get vector projected throught normal
+  // Need it to be positive when used on normal vector
+  const double dot_nl = vec3_dot(&unit_normal, &light_normalized);
+  // Vector: unit normal vector scaled to dot product length
+  const Vec3 scaled_normal = vec3_scalar_div(&unit_normal, absf(dot_nl));
+  // Global position: point corresponding to tip of scaled normal vector when starting from point on object
+  const Vec3 projected_on_normal = vec3_add(point, &scaled_normal);
+  // Vector: from base of normalized light vector to tip of scaled normal vector
+  const Vec3 to_proj_point = vec3_add(&scaled_normal, &light_normalized);
+  // Global position of tip of light vector "reflected" across normal vector
+  const Vec3 reflected_point = vec3_add(&projected_on_normal, &to_proj_point);
+  // Direction vector of line from point on object to reflected point
+  const Vec3 direction_vec_reflection = vec3_difference(&reflected_point, point);
 
-  double total_intensity = 0.0;
-  for (int i = 0; i < num_lights; i++) {
-    Light *light = lights[i];
-    switch (light->type) {
-    case DIRECTIONAL: {
-      const Vec3 light_vec_normalized = normalized(&light->direction);
-      if (vec3_equal_with_error_margin(&light_vec_normalized, &possible_light_vec_normalized, 1.55))
-        total_intensity += light->intensity;
-      break;
-    }
-    }
-  }
+  // get line representation
+  const double x = (origin->x - point->x) / (direction_vec_reflection.x != 0.0 ? direction_vec_reflection.x : 1);
+  const double y = (origin->y - point->y) / (direction_vec_reflection.y != 0.0 ? direction_vec_reflection.y : 1);
+  const double z = (origin->z - point->z) / (direction_vec_reflection.z != 0.0 ? direction_vec_reflection.z : 1);
 
-  return total_intensity;
+  // check to see if origin is part of that line
+  // if it is, congrats you got light!
+  return absf(x - y) < 5 && absf(y == z) < 5;
 }
 
 void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *origin, World *world) {
@@ -119,11 +120,17 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *origin, W
       }
 
       if (min_lambda < INFINITY) {
-        double intensity = get_light_intensity_at_point(&v, visible_object, &world->lights, world->num_lights);
+        for (int i = 0; i < world->num_lights; i++) {
+          Light *light = &world->lights[i];
+          bool light_bounces_toward_origin = does_light_bounce_towards_origin(origin, &v, visible_object, light);
 
-        color.r = min(255, color.r + intensity);
-        color.g = min(255, color.g + intensity);
-        color.b = min(255, color.b + intensity);
+          if (light_bounces_toward_origin) {
+            color.r = min(255, color.r + light->intensity);
+            color.g = min(255, color.g + light->intensity);
+            color.b = min(255, color.b + light->intensity);
+          }
+        }
+
         DrawPixel(x + halfScreenWidth, y + halfScreenHeight, color);
       }
     }

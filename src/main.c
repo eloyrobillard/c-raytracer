@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
                             .radius = 1,
                         }};
 
-    Light lights[] = {{.type = DIRECTIONAL, .direction = {.x = -1, .y = 1, .z = 1}, .intensity = 100.0}};
+    Light lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 100.0}};
 
     World world = {.objects = objects, .num_objects = 3, .lights = lights, .num_lights = 1};
 
