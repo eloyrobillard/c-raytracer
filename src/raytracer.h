@@ -3,6 +3,7 @@
 #include "raylib.h"
 
 typedef enum { SPHERE, SQUARE, PLANE } ObjectType;
+typedef enum { DIRECTIONAL } LightType;
 
 typedef struct {
   double x;
@@ -21,9 +22,22 @@ typedef struct {
 } Object;
 
 typedef struct {
+  LightType type;
+  Vec3 direction;
+  double intensity;
+} Light;
+
+typedef struct {
   Object *objects;
   int num_objects;
+  Light *lights;
+  int num_lights;
 } World;
+
+typedef struct {
+  Vec3 direction;
+  double intensity;
+} DirectedLight;
 
 void trace_rays(int, int, const Vec3 *origin, World *world);
 #endif
