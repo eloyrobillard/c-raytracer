@@ -91,7 +91,9 @@ double compute_light_intensity_ratio_at_point(const Vec3 *origin, const Vec3 *po
 
   const Vec3 unit_reflection_vec = normalized(&direction_vec_reflection);
 
-  return absf(vec3_dot(&unit_reflection_vec, &point_normalized));
+  const double result = vec3_dot(&unit_reflection_vec, &point_normalized);
+
+  return result < 0 ? -result : 0;
 }
 
 void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *camera, World *world) {
