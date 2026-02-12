@@ -65,6 +65,10 @@ double intersects_with_sphere(const Vec3 *origin, const Vec3 *v, Object *sphere)
 
 Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, const Vec3 *point) {
   const double dot_nl = vec3_dot(normal, to_reflect);
+
+  if (dot_nl >= 0)
+    return *to_reflect;
+
   const Vec3 scaled_normal = vec3_scalar_div(normal, absf(dot_nl));
   const Vec3 projected_on_normal = vec3_add(point, &scaled_normal);
   const Vec3 to_proj_point = vec3_add(&scaled_normal, to_reflect);
@@ -83,15 +87,10 @@ double compute_light_intensity_ratio_at_point(const Vec3 *origin, const Vec3 *po
 
   // Direction vector of line from point on object to tip of reflected light vector
   const Vec3 direction_vec_reflection = reflection_of_vector_at_point(&light_normalized, &unit_normal, point);
-  const Vec3 to = {1, -1, 0};
-  const Vec3 norm = {0, 1, 0};
-  const Vec3 p = {0, 0, 0};
-  const Vec3 test = reflection_of_vector_at_point(&to, &norm, &p);
-  print_vec3(&test);
 
   const Vec3 unit_reflection_vec = normalized(&direction_vec_reflection);
 
-  return -vec3_dot(&unit_reflection_vec, &point_normalized);
+  return absf(vec3_dot(&unit_reflection_vec, &point_normalized));
 }
 
 void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *origin, World *world) {
@@ -123,7 +122,6 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *origin, W
         for (int i = 0; i < world->num_lights; i++) {
           Light *light = &world->lights[i];
           double light_intensity_ratio = compute_light_intensity_ratio_at_point(origin, &v, visible_object, light);
-          printf("%f\n", light_intensity_ratio);
 
           double light_intensity_scaled = light->intensity * light_intensity_ratio;
           color.r = min(255, color.r + light_intensity_scaled);
