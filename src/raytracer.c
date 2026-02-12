@@ -63,41 +63,41 @@ double intersects_with_sphere(const Vec3 *origin, const Vec3 *v, Object *sphere)
     return INFINITY;
 }
 
-bool does_light_bounce_towards_origin(const Vec3 *origin, const Vec3 *point, const Object *obj, const Light *light) {
+Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, const Vec3 *point) {
+  const double dot_nl = vec3_dot(normal, to_reflect);
+  const Vec3 scaled_normal = vec3_scalar_div(normal, absf(dot_nl));
+  const Vec3 projected_on_normal = vec3_add(point, &scaled_normal);
+  const Vec3 to_proj_point = vec3_add(&scaled_normal, to_reflect);
+  const Vec3 reflected_point = vec3_add(&projected_on_normal, &to_proj_point);
+  return vec3_difference(&reflected_point, point);
+}
+
+double compute_light_intensity_ratio_at_point(const Vec3 *origin, const Vec3 *point, const Object *obj,
+                                              const Light *light) {
   const Vec3 normal = vec3_difference(&obj->pos_center, point);
   const Vec3 unit_normal = normalized(&normal);
 
   // TODO: don't normalize every time
   const Vec3 light_normalized = normalized(&light->direction);
+  const Vec3 point_normalized = normalized(point);
 
-  // get vector projected throught normal
-  // Need it to be positive when used on normal vector
-  const double dot_nl = vec3_dot(&unit_normal, &light_normalized);
-  // Vector: unit normal vector scaled to dot product length
-  const Vec3 scaled_normal = vec3_scalar_div(&unit_normal, absf(dot_nl));
-  // Global position: point corresponding to tip of scaled normal vector when starting from point on object
-  const Vec3 projected_on_normal = vec3_add(point, &scaled_normal);
-  // Vector: from base of normalized light vector to tip of scaled normal vector
-  const Vec3 to_proj_point = vec3_add(&scaled_normal, &light_normalized);
-  // Global position of tip of light vector "reflected" across normal vector
-  const Vec3 reflected_point = vec3_add(&projected_on_normal, &to_proj_point);
-  // Direction vector of line from point on object to reflected point
-  const Vec3 direction_vec_reflection = vec3_difference(&reflected_point, point);
+  // Direction vector of line from point on object to tip of reflected light vector
+  const Vec3 direction_vec_reflection = reflection_of_vector_at_point(&light_normalized, &unit_normal, point);
+  const Vec3 to = {1, -1, 0};
+  const Vec3 norm = {0, 1, 0};
+  const Vec3 p = {0, 0, 0};
+  const Vec3 test = reflection_of_vector_at_point(&to, &norm, &p);
+  print_vec3(&test);
 
-  // get line representation
-  const double x = (origin->x - point->x) / (direction_vec_reflection.x != 0.0 ? direction_vec_reflection.x : 1);
-  const double y = (origin->y - point->y) / (direction_vec_reflection.y != 0.0 ? direction_vec_reflection.y : 1);
-  const double z = (origin->z - point->z) / (direction_vec_reflection.z != 0.0 ? direction_vec_reflection.z : 1);
+  const Vec3 unit_reflection_vec = normalized(&direction_vec_reflection);
 
-  // check to see if origin is part of that line
-  // if it is, congrats you got light!
-  return absf(x - y) < 5 && absf(y == z) < 5;
+  return -vec3_dot(&unit_reflection_vec, &point_normalized);
 }
 
 void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *origin, World *world) {
   for (int x = -halfScreenWidth; x < halfScreenWidth; x++) {
     for (int y = -halfScreenHeight; y < halfScreenHeight; y++) {
-      const Vec3 direction = {.x = x, .y = y, .z = 1};
+      const Vec3 direction = {x, y, 1};
       const Vec3 v = vec3_difference(&direction, origin);
 
       double min_lambda = INFINITY;
@@ -122,13 +122,13 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *origin, W
       if (min_lambda < INFINITY) {
         for (int i = 0; i < world->num_lights; i++) {
           Light *light = &world->lights[i];
-          bool light_bounces_toward_origin = does_light_bounce_towards_origin(origin, &v, visible_object, light);
+          double light_intensity_ratio = compute_light_intensity_ratio_at_point(origin, &v, visible_object, light);
+          printf("%f\n", light_intensity_ratio);
 
-          if (light_bounces_toward_origin) {
-            color.r = min(255, color.r + light->intensity);
-            color.g = min(255, color.g + light->intensity);
-            color.b = min(255, color.b + light->intensity);
-          }
+          double light_intensity_scaled = light->intensity * light_intensity_ratio;
+          color.r = min(255, color.r + light_intensity_scaled);
+          color.g = min(255, color.g + light_intensity_scaled);
+          color.b = min(255, color.b + light_intensity_scaled);
         }
 
         DrawPixel(x + halfScreenWidth, y + halfScreenHeight, color);

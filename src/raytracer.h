@@ -40,4 +40,8 @@ typedef struct {
 } DirectedLight;
 
 void trace_rays(int, int, const Vec3 *origin, World *world);
+double compute_light_intensity_ratio_at_point(const Vec3 *origin, const Vec3 *point, const Object *obj,
+                                              const Light *light);
+Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, const Vec3 *point);
+void print_vec3(const Vec3 *v);
 #endif
