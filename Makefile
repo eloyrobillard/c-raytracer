@@ -1,11 +1,17 @@
 LD=-L./lib/ -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 SRC=src/*.c
+TEST=test/*.c
 
 .PHONY: main
 main:
 	${CC} ${SRC} -O1 -Wall -std=c99 -Wno-missing-braces -I ./include/ ${LD}
 	./a.out
+
+.PHONY: test
+test:
+	${CC} ${TEST} src/raytracer.c -o test.out -std=c99 -Wno-missing-braces -I ./include/ ${LD}
+	./test.out
 
 setup-raylib:
 	git clone https://github.com/raysan5/raylib.git raylib
