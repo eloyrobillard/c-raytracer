@@ -61,4 +61,4 @@ Please, I'd love to see you try that. Myself, I'll resort to something much easi
 "But aren't there INFINITE possible directions to look at? How's that gonna help you?"
 
 Good point. So I'll resort to a small simplification: I'm only gonna set the direction going from the camera to **one of the viewport's pixels**.
-No matter how big your viewport, no way it would have infinite pixels, correct?
+No matter how big your viewport, it only has a finite number of pixels, just like your monitor.
