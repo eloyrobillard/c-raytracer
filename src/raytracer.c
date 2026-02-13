@@ -93,6 +93,8 @@ double compute_light_intensity_ratio_at_point(const Vec3 *point, const Object *o
 
   const Vec3 unit_reflection_vec = normalized(&direction_vec_reflection);
 
+  // We get a light intensity equal to the "percentage" of light is coming our way
+  // This is to simulate light scattering in some way
   const double result = vec3_dot(&unit_reflection_vec, &point_normalized);
 
   return result < 0 ? -result : 0;
