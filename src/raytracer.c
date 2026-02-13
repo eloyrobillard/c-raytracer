@@ -109,7 +109,7 @@ double compute_light_intensity_ratio_at_point(const Vec3 *point, const Object *o
 void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *camera, World *world) {
   for (int x = -halfScreenWidth; x < halfScreenWidth; x++) {
     for (int y = -halfScreenHeight; y < halfScreenHeight; y++) {
-      const Vec3 direction = {x, y, 1};
+      const Vec3 direction = {x, y, 0};
       const Vec3 v = vec3_difference(&direction, camera);
 
       double min_lambda = INFINITY;
@@ -137,7 +137,8 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *camera, W
           Vec3 point = vec3_scalar_mul(&v, min_lambda);
           double light_intensity_ratio = compute_light_intensity_ratio_at_point(&point, visible_object, light);
 
-          double light_intensity_scaled = light->intensity * light_intensity_ratio;
+          double light_intensity_scaled = light->intensity * light_intensity_ratio * light_intensity_ratio *
+                                          light_intensity_ratio * light_intensity_ratio;
           color.r = min(255, color.r + light_intensity_scaled);
           color.g = min(255, color.g + light_intensity_scaled);
           color.b = min(255, color.b + light_intensity_scaled);

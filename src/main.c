@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
                         {
                             .type = SPHERE,
                             .pos_center = {.x = -240, .y = -160, .z = 250},
-                            .color = GREEN,
+                            .color = BROWN,
                             .radius = 125,
                         },
                         {
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
                             .radius = 125,
                         }};
 
-    Light lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 100.0}};
+    Light lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 600.0}};
 
     World world = {.objects = objects, .num_objects = 3, .lights = lights, .num_lights = 1};
 
