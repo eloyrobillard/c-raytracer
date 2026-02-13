@@ -77,8 +77,7 @@ Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, c
   return vec3_difference(&reflected_point, point);
 }
 
-double compute_light_intensity_ratio_at_point(const Vec3 *origin, const Vec3 *point, const Object *obj,
-                                              const Light *light) {
+double compute_light_intensity_ratio_at_point(const Vec3 *point, const Object *obj, const Light *light) {
   const Vec3 normal = vec3_difference(&obj->pos_center, point);
   const Vec3 unit_normal = normalized(&normal);
 
@@ -125,7 +124,7 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *camera, W
         for (int i = 0; i < world->num_lights; i++) {
           Light *light = &world->lights[i];
           Vec3 point = vec3_scalar_mul(&v, min_lambda);
-          double light_intensity_ratio = compute_light_intensity_ratio_at_point(camera, &point, visible_object, light);
+          double light_intensity_ratio = compute_light_intensity_ratio_at_point(&point, visible_object, light);
 
           double light_intensity_scaled = light->intensity * light_intensity_ratio;
           color.r = min(255, color.r + light_intensity_scaled);
