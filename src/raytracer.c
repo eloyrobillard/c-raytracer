@@ -72,7 +72,7 @@ Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, c
     return *to_reflect;
 
   const Vec3 scaled_normal = vec3_scalar_mul(normal, -dot_nl);
-  // Place the scaled normal in global coordinates
+  // Place the scaled normal in global coordinates to get the coordinates of its tip
   const Vec3 projected_on_normal = vec3_add(point, &scaled_normal);
   const Vec3 to_proj_point = vec3_add(&scaled_normal, to_reflect);
   // Get symmetrical reflection of base of light vector (if it was in global coordinates)
@@ -143,7 +143,7 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *camera, W
           color.b = min(255, color.b + light_intensity_scaled);
         }
 
-        DrawPixel(x + halfScreenWidth, y + halfScreenHeight, color);
+        DrawPixel(x + halfScreenWidth, -y + halfScreenHeight, color);
       }
     }
   }
