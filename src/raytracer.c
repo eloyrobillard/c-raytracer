@@ -1,4 +1,5 @@
 #include "raytracer.h"
+#include <assert.h>
 #include <math.h>
 #include <raylib.h>
 #include <stdbool.h>
@@ -70,14 +71,16 @@ Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, c
   if (dot_nl >= 0)
     return *to_reflect;
 
-  const Vec3 scaled_normal = vec3_scalar_div(normal, -dot_nl);
+  const Vec3 scaled_normal = vec3_scalar_mul(normal, -dot_nl);
   // Place the scaled normal in global coordinates
   const Vec3 projected_on_normal = vec3_add(point, &scaled_normal);
   const Vec3 to_proj_point = vec3_add(&scaled_normal, to_reflect);
   // Get symmetrical reflection of base of light vector (if it was in global coordinates)
   // through normal vector
   const Vec3 reflected_point = vec3_add(&projected_on_normal, &to_proj_point);
-  return vec3_difference(&reflected_point, point);
+  const Vec3 reflected_vector = vec3_difference(&reflected_point, point);
+
+  return reflected_vector;
 }
 
 double compute_light_intensity_ratio_at_point(const Vec3 *point, const Object *obj, const Light *light) {
@@ -85,17 +88,20 @@ double compute_light_intensity_ratio_at_point(const Vec3 *point, const Object *o
   const Vec3 unit_normal = normalized(&normal);
 
   // TODO: don't normalize every time
-  const Vec3 light_normalized = normalized(&light->direction);
-  const Vec3 point_normalized = normalized(point);
+  const Vec3 unit_light = normalized(&light->direction);
+  const Vec3 unit_point = normalized(point);
 
   // Direction vector of line from point on object to tip of reflected light vector
-  const Vec3 direction_vec_reflection = reflection_of_vector_at_point(&light_normalized, &unit_normal, point);
+  const Vec3 direction_vec_reflection = reflection_of_vector_at_point(&unit_light, &unit_normal, point);
+
+  // Reflected vector should have (about) the same length as the unit light vector (= 1)
+  assert(absf(vec3_magnitude(&direction_vec_reflection) - vec3_magnitude(&unit_light)) < 0.1);
 
   const Vec3 unit_reflection_vec = normalized(&direction_vec_reflection);
 
   // We get a light intensity equal to the "percentage" of light is coming our way
   // This is to simulate light scattering in some way
-  const double result = vec3_dot(&unit_reflection_vec, &point_normalized);
+  const double result = vec3_dot(&unit_reflection_vec, &unit_point);
 
   return result < 0 ? -result : 0;
 }
