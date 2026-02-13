@@ -70,9 +70,12 @@ Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, c
   if (dot_nl >= 0)
     return *to_reflect;
 
-  const Vec3 scaled_normal = vec3_scalar_div(normal, absf(dot_nl));
+  const Vec3 scaled_normal = vec3_scalar_div(normal, -dot_nl);
+  // Place the scaled normal in global coordinates
   const Vec3 projected_on_normal = vec3_add(point, &scaled_normal);
   const Vec3 to_proj_point = vec3_add(&scaled_normal, to_reflect);
+  // Get symmetrical reflection of base of light vector (if it was in global coordinates)
+  // through normal vector
   const Vec3 reflected_point = vec3_add(&projected_on_normal, &to_proj_point);
   return vec3_difference(&reflected_point, point);
 }
