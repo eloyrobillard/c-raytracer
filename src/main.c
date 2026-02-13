@@ -18,21 +18,21 @@ int main(int argc, char **argv) {
     Vec3 camera = {.x = 0, .y = 0, .z = -screenWidth};
     Object objects[] = {{
                             .type = SPHERE,
-                            .pos_center = {.x = 0, .y = 0, .z = 10000},
+                            .pos_center = {.x = 0, .y = 0, .z = 150},
                             .color = RED,
-                            .radius = 2000,
+                            .radius = 250,
                         },
                         {
                             .type = SPHERE,
-                            .pos_center = {.x = -2000, .y = -2000, .z = 15000},
+                            .pos_center = {.x = -240, .y = -160, .z = 250},
                             .color = GREEN,
-                            .radius = 1000,
+                            .radius = 125,
                         },
                         {
                             .type = SPHERE,
-                            .pos_center = {.x = 600, .y = 400, .z = 5000},
+                            .pos_center = {.x = 240, .y = 160, .z = 5},
                             .color = BLUE,
-                            .radius = 500,
+                            .radius = 125,
                         }};
 
     Light lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 100.0}};
