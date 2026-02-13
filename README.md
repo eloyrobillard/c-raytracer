@@ -46,3 +46,19 @@ Contrast this with a cube: a cube's edges are much farther to its center than po
 
 See how far the "Far" point is? Nuts!
 
+To sum up:
+- figuring out if a point is part of a sphere requires knowing if it's distance to the center equals the radius;
+- figuring out if a point is part of a cube requires knowing it's distance to the center, the rotation of the cube in 3D space, and then a bunch of calculations;
+
+#### Figuring out if a point is on a sphere
+
+What's that? "Didn't you say all this requires is checking that the distance of the point is equal to the radius? What do you need a whole section for?"
+
+Because, what, you were gonna check EVERY point to see if it's one radius away from the center? EVERY point of an INFINITE 3D space?
+
+Please, I'd love to see you try that. Myself, I'll resort to something much easier on my computer: computing the position of each point given the sphere's center and a direction going from the camera to the viewport.
+
+"But aren't there INFINITE possible directions to look at? How's that gonna help you?"
+
+Good point. So I'll resort to a small simplification: I'm only gonna set the direction going from the camera to **one of the viewport's pixels**.
+No matter how big your viewport, no way it would have infinite pixels, correct?
