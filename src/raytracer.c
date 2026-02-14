@@ -11,12 +11,12 @@ double absf(double a) { return a < 0 ? -a : a; };
 void print_vec3(const Vec3 *v) { printf("x: %f y: %f z: %f\n", v->x, v->y, v->z); }
 
 Vec3 vec3_add(const Vec3 *v1, const Vec3 *v2) {
-  Vec3 v = {.x = v1->x + v2->x, .y = v1->y + v2->y, .z = v1->z + v2->z};
+  Vec3 v = {v1->x + v2->x, v1->y + v2->y, v1->z + v2->z};
   return v;
 }
 
 Vec3 vec3_difference(const Vec3 *v1, const Vec3 *v2) {
-  Vec3 v = {.x = v1->x - v2->x, .y = v1->y - v2->y, .z = v1->z - v2->z};
+  Vec3 v = {v1->x - v2->x, v1->y - v2->y, v1->z - v2->z};
   return v;
 }
 
@@ -30,12 +30,12 @@ double vec3_dot(const Vec3 *v1, const Vec3 *v2) { return v1->x * v2->x + v1->y *
 double vec3_magnitude_squared(const Vec3 *v) { return vec3_dot(v, v); }
 
 Vec3 vec3_scalar_mul(const Vec3 *v, double scalar) {
-  Vec3 res = {.x = v->x * scalar, .y = v->y * scalar, .z = v->z * scalar};
+  Vec3 res = {v->x * scalar, v->y * scalar, v->z * scalar};
   return res;
 }
 
 Vec3 vec3_scalar_div(const Vec3 *v, double scalar) {
-  Vec3 res = {.x = v->x / scalar, .y = v->y / scalar, .z = v->z / scalar};
+  Vec3 res = {v->x / scalar, v->y / scalar, v->z / scalar};
   return res;
 }
 
