@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
     ClearBackground(RAYWHITE);
 
-    Vec3 camera = {.x = 0, .y = 0, .z = -screenWidth};
+    Vec3 camera = {.x = 0, .y = 0, .z = -halfWidth};
     Object objects[] = {{
                             .type = SPHERE,
                             .pos_center = {.x = 0, .y = 0, .z = 150},
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
                             .radius = 125,
                         }};
 
-    Light lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 600.0}};
+    Light lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 120.0}};
 
     World world = {.objects = objects, .num_objects = 3, .lights = lights, .num_lights = 1};
 

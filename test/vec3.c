@@ -32,7 +32,7 @@ void test_vector_reflection() {
 
 void test_light_intensity_ratio_computation() {
   const Vec3 point = {0, 0, 1};
-  const Object obj = {SPHERE, {0, 0, 31}, 30};
+  const Vec3 obj = {0, 0, 31};
   const Light light = {DIRECTIONAL, {0, 0, 1}, 100};
   double intensity = compute_light_intensity_ratio_at_point(&point, &obj, &light);
   assert(intensity == 1);

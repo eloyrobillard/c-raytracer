@@ -43,13 +43,14 @@ double vec3_magnitude(const Vec3 *v) { return sqrt(vec3_magnitude_squared(v)); }
 
 Vec3 normalized(const Vec3 *v) { return vec3_scalar_div(v, vec3_magnitude(v)); }
 
-double intersects_with_sphere(const Vec3 *camera, const Vec3 *v, Object *sphere) {
+double intersects_with_sphere(const Vec3 *camera, const Vec3 *v, const Vec3 *camera_to_sphere_center,
+                              const double radius) {
   double mag_sqr_v = vec3_magnitude_squared(v);
-  Vec3 camera_to_sphere_center = vec3_difference(&sphere->pos_center, camera);
-  double mag_sqr_c = vec3_magnitude_squared(&camera_to_sphere_center);
-  double dot_cv = vec3_dot(v, &camera_to_sphere_center);
 
-  double delta = 4 * dot_cv * dot_cv - 4 * mag_sqr_v * (mag_sqr_c - sphere->radius * sphere->radius);
+  double mag_sqr_c = vec3_magnitude_squared(camera_to_sphere_center);
+  double dot_cv = vec3_dot(v, camera_to_sphere_center);
+
+  double delta = 4 * dot_cv * dot_cv - 4 * mag_sqr_v * (mag_sqr_c - radius * radius);
   if (delta < 0)
     return INFINITY;
 
@@ -85,8 +86,8 @@ Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, c
   return reflected_vector;
 }
 
-double compute_light_intensity_ratio_at_point(const Vec3 *point, const Object *obj, const Light *light) {
-  const Vec3 normal = vec3_difference(&obj->pos_center, point);
+double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sphere_center, const Light *light) {
+  const Vec3 normal = vec3_difference(point, sphere_center);
   const Vec3 unit_normal = normalized(&normal);
 
   // TODO: don't normalize every time
@@ -116,18 +117,19 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *camera, W
 
       double min_lambda = INFINITY;
       Color color = WHITE;
-      Object *visible_object = NULL;
+      Vec3 camera_to_sphere_center = {0, 0, 0};
       for (int obji = 0; obji < world->num_objects; obji++) {
         Object *object = &world->objects[obji];
 
         switch (object->type) {
         case SPHERE: {
-          double lambda = intersects_with_sphere(camera, &v, object);
+          Vec3 cs = vec3_difference(&object->pos_center, camera);
+          double lambda = intersects_with_sphere(camera, &v, &cs, object->radius);
 
           if (lambda < min_lambda) {
             min_lambda = lambda;
             color = object->color;
-            visible_object = object;
+            camera_to_sphere_center = cs;
           }
         } break;
         }
@@ -137,10 +139,10 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, const Vec3 *camera, W
         for (int i = 0; i < world->num_lights; i++) {
           Light *light = &world->lights[i];
           Vec3 point = vec3_scalar_mul(&v, min_lambda);
-          double light_intensity_ratio = compute_light_intensity_ratio_at_point(&point, visible_object, light);
+          double light_intensity_ratio =
+              compute_light_intensity_ratio_at_point(&point, &camera_to_sphere_center, light);
 
-          double light_intensity_scaled = light->intensity * light_intensity_ratio * light_intensity_ratio *
-                                          light_intensity_ratio * light_intensity_ratio;
+          double light_intensity_scaled = light->intensity * light_intensity_ratio;
           color.r = min(255, color.r + light_intensity_scaled);
           color.g = min(255, color.g + light_intensity_scaled);
           color.b = min(255, color.b + light_intensity_scaled);
