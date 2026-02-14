@@ -78,3 +78,43 @@ Now, from the sphere's perspective, we get three possible situations:
 1. L doesn't intersect with the sphere's surface
 2. L intersects with the sphere in exactly one point (it's a tangent to the sphere's surface)
 3. L goes right into the sphere, intersecting with it's surface in 2 points (on the way in and out)
+
+All we need is a way to find if and where the line and sphere instersect.
+
+#### Finding the intersection of a line and a sphere
+
+Spoiler: we can use a quadratic equation.
+
+How? What we want is to $0 <= k <= 2$ points of the line that will be exactly one radius away from the sphere's center.
+
+The way I chose to do it is by using the following equation: 
+
+```math
+\|\lambda \vec{V}_{camera} - \vec{C}_{sphere} \|^2 = r^2
+```
+
+Here, we need to solve for $\lambda$, which is the scalar that would scale the "eye of the camera" vector to exactly the position of one of the points on the sphere's surface.
+
+Unfolding the expression to make the quadratic equation appear, we get:
+
+```math
+\|\vec{V}\|^2 \lambda^2 - 2 (\vec{V} \cdot \vec{C}) \lambda + \|\vec{C}\|^2 - r^2 = 0
+```
+
+Delta:
+
+```math
+\Delta = 4 (\vec{V} \cdot \vec{C}) ^ 2 - 4 \|\vec{V}\|^2 (\|\vec{C}\|^2 - r^2)
+```
+
+If :
+
+- $\Delta < 0$: the line L does not intersect the sphere
+- $\Delta = 0$: L is tangent to the sphere
+- $\Delta > 0$: L goes in and out of the sphere, intersecting it's surface in two points
+
+And now we solve for $\lambda$:
+
+```math
+\lambda = \dfrac{2 (\vec{V} \cdot \vec{C}) \pm \sqrt{\Delta}}{2\|\vec{V}\|^2}
+```
