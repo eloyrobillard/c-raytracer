@@ -1,6 +1,8 @@
 # Raytracer in C
 
-## How to
+A first attempt at making a raytracer form scratch using C.
+
+## How to use
 
 ### Dependencies
 
@@ -14,7 +16,7 @@ Just type `make`.
 
 A version runnable from the web is available on itch.io (WIP)
 
-## Log
+## Write up
 
 ### Showing spheres on the screen
 
@@ -29,7 +31,7 @@ The "screen" requires 3 elements:
 - a viewport
 - a world (something to look at)
 
-<img width="374" alt="image" src="https://github.com/user-attachments/assets/d95c480f-0f79-49ef-aec5-a5776556c149" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/d95c480f-0f79-49ef-aec5-a5776556c149" />
 
 #### Why spheres?
 
@@ -42,7 +44,7 @@ exactly one radius away from it's center.
 
 Contrast this with a cube: a cube's edges are much farther to its center than points at the center of one of its faces.
 
-<img width="374" alt="image" src="https://github.com/user-attachments/assets/3b2287f4-d0cc-40c1-b78b-d5ac69f81d84" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/3b2287f4-d0cc-40c1-b78b-d5ac69f81d84" />
 
 See how far the "Far" point is? Nuts!
 
@@ -62,3 +64,17 @@ Please, I'd love to see you try that. Myself, I'll resort to something much easi
 
 Good point. So I'll resort to a small simplification: I'm only gonna set the direction going from the camera to **one of the viewport's pixels**.
 No matter how big your viewport, it only has a finite number of pixels, just like your monitor.
+
+The situation is like this:
+
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/a8854c32-fb80-447f-9b30-3c16b8c212d9" />
+
+As you can see, the viewport's "pixels" form a grid. Using the coordinates of each pixel we can create a vector from the camera to that pixel, and then extend it into the world (by scaling it with a scalar).
+
+We can now use the vector's direction to create a line (L) passing through the origin.
+
+Now, from the sphere's perspective, we get three possible situations:
+
+1. L doesn't intersect with the sphere's surface
+2. L intersects with the sphere in exactly one point (it's a tangent to the sphere's surface)
+3. L goes right into the sphere, intersecting with it's surface in 2 points (on the way in and out)
