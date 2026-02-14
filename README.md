@@ -122,3 +122,18 @@ And now we solve for $\lambda$:
 #### Finalising sphere intersection
 
 Now that we know whether a given ray intersects or not with a sphere, we can draw that information on the screen.
+
+That is, if we figure out which sphere we intersected with, we can paint its color on the corresponding pixel of our viewport/screen. 
+If we intersected several spheres with one ray, we can use z ordering to paint the one closest to us.
+
+The result is as follows:
+
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/214f1e1c-b861-47e2-a660-b05736c6d5b6" />
+
+WOW! THAT'S... utterly unimpressive.
+
+"Wait, weren't these supposed to be spheres? Why do we get circles?"
+
+Yeah... That's because we have no light/shadow stuff going on, so we have perspective stuff going on. Also explains why everything looks so bland: it's just single colors.
+
+Okay, time to fix this!
