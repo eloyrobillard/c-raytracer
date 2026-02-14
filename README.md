@@ -144,3 +144,12 @@ WOW! THAT'S... utterly unimpressive.
 Yeah... That's because we have no light/shadow stuff going on, so there's no perspective at all. Also explains why everything looks so bland: it's just single colors.
 
 Okay, time to fix this!
+
+### Bringing light to the world
+
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/ac9d11aa-a9b9-44c8-b86c-8b2c6a4c275f" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/f02ed27a-9de7-4e19-bb51-663516ce2288" />
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/3c902578-dee1-4353-9e82-76887304fdc2" />
+
+
+
