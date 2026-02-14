@@ -71,17 +71,17 @@ The situation is like this:
 
 As you can see, the viewport's "pixels" form a grid. Using the coordinates of each pixel we can create a vector from the camera to that pixel, and then extend it into the world (by scaling it with a scalar).
 
-We can now use the vector's direction to create a line (L) passing through the origin.
+What we're doing is creating a ray (R) starting from the camera.
 
 Now, from the sphere's perspective, we get three possible situations:
 
-1. L doesn't intersect with the sphere's surface
-2. L intersects with the sphere in exactly one point (it's a tangent to the sphere's surface)
-3. L goes right into the sphere, intersecting with it's surface in 2 points (on the way in and out)
+1. R doesn't intersect with the sphere's surface
+2. R intersects with the sphere in exactly one point (it's a tangent to the sphere's surface)
+3. R goes right into the sphere, intersecting with it's surface in 2 points (on the way in and out)
 
-All we need is a way to find if and where the line and sphere instersect.
+All we need is a way to find if and where the ray and sphere instersect.
 
-#### Finding the intersection of a line and a sphere
+#### Finding the intersection of a ray and a sphere
 
 Spoiler: we can use a quadratic equation.
 
@@ -109,12 +109,16 @@ Delta:
 
 If :
 
-- $\Delta < 0$: the line L does not intersect the sphere
-- $\Delta = 0$: L is tangent to the sphere
-- $\Delta > 0$: L goes in and out of the sphere, intersecting it's surface in two points
+- $\Delta < 0$: the ray R does not intersect the sphere
+- $\Delta = 0$: R is tangent to the sphere
+- $\Delta > 0$: R goes in and out of the sphere, intersecting it's surface in two points
 
 And now we solve for $\lambda$:
 
 ```math
 \lambda = \dfrac{2 (\vec{V} \cdot \vec{C}) \pm \sqrt{\Delta}}{2\|\vec{V}\Vert^2}
 ```
+
+#### Finalising sphere intersection
+
+Now that we know whether a given ray intersects or not with a sphere, we can draw that information on the screen.
