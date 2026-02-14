@@ -134,6 +134,6 @@ WOW! THAT'S... utterly unimpressive.
 
 "Wait, weren't these supposed to be spheres? Why do we get circles?"
 
-Yeah... That's because we have no light/shadow stuff going on, so we have perspective stuff going on. Also explains why everything looks so bland: it's just single colors.
+Yeah... That's because we have no light/shadow stuff going on, so there's no perspective at all. Also explains why everything looks so bland: it's just single colors.
 
 Okay, time to fix this!
