@@ -116,5 +116,5 @@ If :
 And now we solve for $\lambda$:
 
 ```math
-\lambda = \dfrac{2 (\vec{V} \cdot \vec{C}) \pm \sqrt{\Delta}}{2\|\vec{V}\|^2}
+\lambda = \dfrac{2 (\vec{V} \cdot \vec{C}) \pm \sqrt{\Delta}}{2\|\vec{V}\Vert^2}
 ```
