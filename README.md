@@ -90,7 +90,7 @@ How? What we want is to $0 <= k <= 2$ points of the line that will be exactly on
 The way I chose to do it is by using the following equation: 
 
 ```math
-\|\lambda \vec{V}_{camera} - \vec{C}_{sphere} \|^2 = r^2
+\|\lambda \vec{R}_{camera} - \vec{C}_{sphere} \|^2 = r^2
 ```
 
 Here, we need to solve for $\lambda$, which is the scalar that would scale the "eye of the camera" vector to exactly the position of one of the points on the sphere's surface.
@@ -98,13 +98,13 @@ Here, we need to solve for $\lambda$, which is the scalar that would scale the "
 Unfolding the expression to make the quadratic equation appear, we get:
 
 ```math
-\|\vec{V}\|^2 \lambda^2 - 2 (\vec{V} \cdot \vec{C}) \lambda + \|\vec{C}\|^2 - r^2 = 0
+\|\vec{R}\|^2 \lambda^2 - 2 (\vec{R} \cdot \vec{C}) \lambda + \|\vec{C}\|^2 - r^2 = 0
 ```
 
 Delta:
 
 ```math
-\Delta = 4 (\vec{V} \cdot \vec{C}) ^ 2 - 4 \|\vec{V}\|^2 (\|\vec{C}\|^2 - r^2)
+\Delta = 4 (\vec{R} \cdot \vec{C}) ^ 2 - 4 \|\vec{R}\|^2 (\|\vec{C}\|^2 - r^2)
 ```
 
 If :
@@ -116,7 +116,7 @@ If :
 And now we solve for $\lambda$:
 
 ```math
-\lambda = \dfrac{2 (\vec{V} \cdot \vec{C}) \pm \sqrt{\Delta}}{2\|\vec{V}\Vert^2}
+\lambda = \dfrac{2 (\vec{R} \cdot \vec{C}) \pm \sqrt{\Delta}}{2\|\vec{R}\Vert^2}
 ```
 
 #### Finalising sphere intersection
