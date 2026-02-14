@@ -68,6 +68,8 @@ double intersects_with_sphere(const Vec3 *camera, const Vec3 *v, Object *sphere)
 Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, const Vec3 *point) {
   const double dot_nl = vec3_dot(normal, to_reflect);
 
+  assert(vec3_magnitude(normal) < 1.01);
+
   if (dot_nl >= 0)
     return *to_reflect;
 
