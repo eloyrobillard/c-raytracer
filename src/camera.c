@@ -19,7 +19,7 @@ void move_camera(RTCamera *camera, float delta) {
   Vec3 unit_move = normalized(&move);
 
   camera->global_position.x += move.x;
-  camera->global_position.y += move.y;
+  camera->global_position.z += move.z;
 }
 
 void tilt_camera(RTCamera *camera, float delta) {
