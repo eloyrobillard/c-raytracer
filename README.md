@@ -95,7 +95,7 @@ The way I chose to do it is by using the following equation:
 
 Here, we need to solve for $\lambda$, which is the scalar that would scale the "eye of the camera" vector to exactly the position of one of the points on the sphere's surface.
 
-Unfolding the expression to make the quadratic equation appear, we get:
+Unfolding the expression to make the quadratic equation appear, we get (I'm skipping over a lot of linear algebra):
 
 ```math
 \|\vec{R}\|^2 \lambda^2 - 2 (\vec{R} \cdot \vec{C}) \lambda + \|\vec{C}\|^2 - r^2 = 0
@@ -147,9 +147,49 @@ Okay, time to fix this!
 
 ## Bringing light to the world
 
+To make our spheres actually look like spheres, we need a way to convey depth to the person looking.
+
+Here we will explore how to simulate light.
+
+### General approach
+
+There are 3 main types of light often used in games:
+
+#### Directional lights
+
+Directional lights are lights coming from the same angle no matter where you are in our scene. One good approximation in our world is the Sun: it is so far away that even if you teleport one kilometer away in any direction, your angle to the Sun won't (visibly) change.
+
+#### Point lights
+
+Point lights are represented by a point in space, meaning they will interact differently with objects depending on where they are.
+This is just like a lamp set on the ceiling: if you start moving around it, your shadow's angle to the light will change.
+
+#### Ambient lights
+
+Ambient lights are applied uniformly to every surface in our scene. They are more like a general "tint" you give your objects, for example to make the overall scene brighter.
+
+Now that we have our lights, it's time to figure out how to show light on the screen. For ambient lights this is easy: just apply the light intensity everywhere.
+But for direcional and point lights we need to compute the angle the light gets reflected at.
+
+Why? Because all light gets reflected to some degree when it encounters an obstacle, but not all in the same direction. More importantly: not all in OUR direction.
+
+The light that we see is the one that reaches our eye/camera. Therefore we need to check how much light bounced in our direction before we can really know how the scene should look.
+
+<img width="400" alt="illustration of light getting reflected, or not, towards the camera" src="https://github.com/user-attachments/assets/bcc4433a-9db5-4c89-be0b-e50725a1e0b2" />
+
+### Reflecting light
+
+To compute the direction the light gets reflected in, we need to know the angle of the surface it hits. For this we use normal vectors.
+
+The normal vector, noted $$\vec{n}$$ in the picture below, is perpendicular (aka orthogonal) to the surface symbolised by the horizontal line.
+Thanks to this, we can reflect the incoming vector on the right by "turning it upwards" such that the reflection will have the same angle to the normal as the original vector:
+
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/8d5301ef-f899-4b7f-8209-f72838542ea6" />
+
+
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/ac9d11aa-a9b9-44c8-b86c-8b2c6a4c275f" />
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/f02ed27a-9de7-4e19-bb51-663516ce2288" />
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/3c902578-dee1-4353-9e82-76887304fdc2" />
 
-
+### Making the sphere look rugged
 
