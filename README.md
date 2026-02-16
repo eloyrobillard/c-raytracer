@@ -16,14 +16,14 @@ Just type `make`.
 
 A version runnable from the web is available on itch.io (WIP)
 
-## Write up
+# Write up
 
-### Showing spheres on the screen
+## Showing spheres on the screen
 
 Step 1 is to show colored spheres on the screen. 
 Perspective should be as you'd expect (if sphere A is behind sphere B, sphere B should show up, not sphere A).
 
-#### Setting up the screen
+### Setting the screen up
 
 The "screen" requires 3 elements:
 
@@ -33,7 +33,7 @@ The "screen" requires 3 elements:
 
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/d95c480f-0f79-49ef-aec5-a5776556c149" />
 
-#### Why spheres?
+### Why spheres?
 
 I know, I know. The first thing I do is draw a cube and call it "World", and yet we're here to talk about spheres!
 
@@ -52,7 +52,7 @@ To sum up:
 - figuring out if a point is part of a sphere requires knowing if it's distance to the center equals the radius;
 - figuring out if a point is part of a cube requires knowing it's distance to the center, the rotation of the cube in 3D space, and then a bunch of calculations;
 
-#### Figuring out if a point is on a sphere
+### Figuring out if a point is on a sphere
 
 What's that? "Didn't you say all this requires is checking that the distance of the point is equal to the radius? What do you need a whole section for?"
 
@@ -81,7 +81,7 @@ Now, from the sphere's perspective, we get three possible situations:
 
 All we need is a way to find if and where the ray and sphere instersect.
 
-#### Finding the intersection of a ray and a sphere
+### Finding the intersection of a ray and a sphere
 
 Spoiler: we can use a quadratic equation.
 
@@ -126,7 +126,7 @@ And now we solve for $\lambda$:
 \lambda = \dfrac{2 (\vec{R} \cdot \vec{C}) \pm \sqrt{\Delta}}{2\|\vec{R}\Vert^2}
 ```
 
-#### Finalising sphere intersection
+### Finalising sphere intersection
 
 Now that we know whether a given ray intersects or not with a sphere, we can draw that information on the screen.
 
@@ -145,7 +145,7 @@ Yeah... That's because we have no light/shadow stuff going on, so there's no per
 
 Okay, time to fix this!
 
-### Bringing light to the world
+## Bringing light to the world
 
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/ac9d11aa-a9b9-44c8-b86c-8b2c6a4c275f" />
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/f02ed27a-9de7-4e19-bb51-663516ce2288" />
