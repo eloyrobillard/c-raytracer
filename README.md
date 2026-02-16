@@ -186,9 +186,28 @@ Thanks to this, we can reflect the incoming vector on the right by "turning it u
 
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/8d5301ef-f899-4b7f-8209-f72838542ea6" />
 
+It's the "turning it upwards" part that requires some thinking. Below is the method I chose (IMPORTANT: all vector are of length 1, otherwise this DOES NOT work)
 
+1. Project the tail of the light vector onto $$\vec{n}$$;
+2. Compute where the position of the tip of the reflected vector by getting twice the distance of the light's tail to the point we just projected on $$\vec{n}$$;
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/ac9d11aa-a9b9-44c8-b86c-8b2c6a4c275f" />
+
+Okay, so far so good. Let's see what this looks like...
+
+<img width="400"  alt="image" src="https://github.com/user-attachments/assets/214f1e1c-b861-47e2-a660-b05736c6d5b6" />
+
+WOW! THAT'S EXACTLY THE SAME AS THE PREVIOUS TIME!
+
+Why?
+
+"Wait, wait! I think I know! It's because we're only looking at light that would reflect EXACTLY in the direction of the camera. But that's a tiny minority of reflections so it looks like there is no light at all!"
+
+CORRECT!
+
+3. Project the tip of the reflected light onto the "camera's gaze" vector (the vector coming from the camera to the specific point of the sphere's surface);
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/f02ed27a-9de7-4e19-bb51-663516ce2288" />
+
+4. The projection should be between 0 and 1 unit away from the surface of the sphere. 
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/3c902578-dee1-4353-9e82-76887304fdc2" />
 
 ### Making the sphere look rugged
