@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
   InitWindow(screenWidth, screenHeight, "Raytracer");
   SetTargetFPS(60);
 
-  RTCamera camera = {.global_position = {0, 0, -halfWidth}, .global_rotation = {0, 0, 0}};
+  RTCamera camera = {.global_position = {0, 0, -halfWidth}, .global_rotation = {0, PI / 2, 0}};
   Object objects[] = {{
                           .type = SPHERE,
                           .pos_center = {.x = 0, .y = 0, .z = 150},
