@@ -1,6 +1,5 @@
 #include "camera.h"
-#include "Vec3.h"
-#include "raytracer.h"
+#include "vec3.h"
 #include <math.h>
 #include <raylib.h>
 

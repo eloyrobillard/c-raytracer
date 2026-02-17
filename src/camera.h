@@ -1,6 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
-#include "Vec3.h"
+#include "vec3.h"
 
 typedef struct {
   Vec3 global_position;

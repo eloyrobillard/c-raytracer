@@ -1,8 +1,8 @@
 #ifndef RAYTRACER_H
 #define RAYTRACER_H
-#include "Vec3.h"
 #include "camera.h"
 #include "raylib.h"
+#include "vec3.h"
 
 typedef enum { SPHERE, SQUARE, PLANE } ObjectType;
 typedef enum { DIRECTIONAL } LightType;
