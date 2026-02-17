@@ -29,6 +29,9 @@ Vec3 normalized(const Vec3 *v);
 Vec3 vm_mul(Mat3 *mat, Vec3 *v);
 Vec3 *vm_mul_inplace(Mat3 *mat, Vec3 *v);
 Vec3 *vec3_rotate_by_inplace(Vec3 *v, double angle_rad);
+Vec3 project_with_y_rotation(Vec3 *move, Vec3 *to_move, double y_rot, double dist);
+void move_with_y_rotation(Vec3 *move, Vec3 *to_move, double y_rot, double speed);
+Vec3 rot_y_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad);
 
 Mat3 rot_y_mat(double angle_rad);
 #endif

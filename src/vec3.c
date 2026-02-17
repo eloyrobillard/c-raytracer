@@ -73,11 +73,31 @@ Vec3 *vec3_rotate_by_inplace(Vec3 *v, double angle_rad) {
   return vm_mul_inplace(&rot_mat, v);
 }
 
+Vec3 project_with_y_rotation(Vec3 *move, Vec3 *to_move, double y_rot, double dist) {
+  Vec3 unit_move = normalized(move);
+  Mat3 rot_mat = rot_y_mat(y_rot);
+  vm_mul_inplace(&rot_mat, &unit_move);
+  vec3_scalar_mul_inplace(&unit_move, dist);
+  return unit_move;
+}
+
+void move_with_y_rotation(Vec3 *move, Vec3 *to_move, double y_rot, double speed) {
+  Vec3 final_move = project_with_y_rotation(move, to_move, y_rot, speed);
+  vec3_add_inplace(to_move, &final_move);
+}
+
+Vec3 rot_y_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad) {
+  Mat3 rotation = rot_y_mat(angle_rad);
+  Vec3 pos_to_point = vec3_difference(to_rotate, point);
+  vm_mul_inplace(&rotation, &pos_to_point);
+  return vec3_add(&pos_to_point, point);
+}
+
 ///////////////////////////////////////////////////////////
 /////////////////////// MATRICES //////////////////////////
 ///////////////////////////////////////////////////////////
 
 Mat3 rot_y_mat(double angle_rad) {
-  Mat3 mat = {{sin(angle_rad), 0, cos(angle_rad)}, {0, 0, 0}, {cos(angle_rad), 0, sin(angle_rad)}};
+  Mat3 mat = {{sin(angle_rad), 0, cos(angle_rad)}, {0, 1, 0}, {cos(angle_rad), 0, sin(angle_rad)}};
   return mat;
 }

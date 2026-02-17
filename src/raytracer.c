@@ -75,9 +75,10 @@ double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sph
 void trace_rays(int halfScreenWidth, int halfScreenHeight, RTCamera *camera, World *world) {
   for (int x = -halfScreenWidth; x < halfScreenWidth; x++) {
     for (int y = -halfScreenHeight; y < halfScreenHeight; y++) {
-      const Vec3 direction = {camera->global_position.x + x, camera->global_position.y + y,
-                              camera->global_position.z + halfScreenWidth};
-      const Vec3 v = vec3_difference(&direction, &camera->global_position);
+      Vec3 direction = {camera->global_position.x + x, camera->global_position.y + y,
+                        camera->global_position.z + halfScreenWidth};
+      Vec3 final_direction = rot_y_around_point(&camera->global_position, &direction, camera->global_rotation.y);
+      const Vec3 v = vec3_difference(&final_direction, &camera->global_position);
 
       double min_lambda = INFINITY;
       Color color = WHITE;
