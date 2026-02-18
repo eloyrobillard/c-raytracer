@@ -10,11 +10,7 @@ A first attempt at making a raytracer form scratch using C.
 
 ### Start up
 
-Just type `make`.
-
-### Web version
-
-A version runnable from the web is available on itch.io (WIP)
+Linux: just type `make`
 
 # Write up
 
