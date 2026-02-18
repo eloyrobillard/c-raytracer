@@ -76,30 +76,17 @@ Vec3 *vec3_rotate_by_inplace(Vec3 *v, double angle_rad) {
   return vm_mul_inplace(&rot_mat, v);
 }
 
-Vec3 project_with_x_rotation(Vec3 *move, Vec3 *to_move, double x_rot, double dist) {
+void move_forward(Vec3 *move, Vec3 *mover, double x_rot, double y_rot, double speed) {
   Vec3 unit_move = normalized(move);
-  Mat3 rot_mat = rot_x_mat(x_rot);
-  vm_mul_inplace(&rot_mat, &unit_move);
-  vec3_scalar_mul_inplace(&unit_move, dist);
-  return unit_move;
+  apply_rotation(rot_x_mat, x_rot, &unit_move);
+  apply_rotation(rot_y_mat, y_rot, &unit_move);
+  vec3_scalar_mul_inplace(&unit_move, speed);
+  vec3_add_inplace(mover, &unit_move);
 }
 
-Vec3 project_with_y_rotation(Vec3 *move, Vec3 *to_move, double y_rot, double dist) {
-  Vec3 unit_move = normalized(move);
-  Mat3 rot_mat = rot_y_mat(y_rot);
-  vm_mul_inplace(&rot_mat, &unit_move);
-  vec3_scalar_mul_inplace(&unit_move, dist);
-  return unit_move;
-}
-
-void move_with_x_rotation(Vec3 *move, Vec3 *to_move, double x_rot, double speed) {
-  Vec3 final_move = project_with_x_rotation(move, to_move, x_rot, speed);
-  vec3_add_inplace(to_move, &final_move);
-}
-
-void move_with_y_rotation(Vec3 *move, Vec3 *to_move, double y_rot, double speed) {
-  Vec3 final_move = project_with_y_rotation(move, to_move, y_rot, speed);
-  vec3_add_inplace(to_move, &final_move);
+void apply_rotation(Mat3 (*rot_f)(double), double rot_rad, Vec3 *rotated) {
+  Mat3 rot_mat = rot_f(rot_rad);
+  vm_mul_inplace(&rot_mat, rotated);
 }
 
 Vec3 rot_x_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad) {
