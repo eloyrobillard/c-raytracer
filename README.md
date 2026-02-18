@@ -179,12 +179,14 @@ The light that we see is the one that reaches our eye/camera. Therefore we need 
 
 ### Reflecting light
 
-To compute the direction the light gets reflected in, we need to know the angle of the surface it hits. For this we use normal vectors.
+To compute the direction the light gets reflected in, we need to know the angle at which light is incident on the surface it hits. For this we will use a normal vector.
 
-The normal vector, noted $$\vec{n}$$ in the picture below, is perpendicular (aka orthogonal) to the surface symbolised by the horizontal line.
-Thanks to this, we can reflect the incoming vector on the right by "turning it upwards" such that the reflection will have the same angle to the normal as the original vector:
+A normal vector, noted $$\vec{n}$$ in the picture below, is perpendicular (aka orthogonal) to the surface symbolised by the horizontal line.
+Thanks to this, we can reflect the incoming vector on the right by "turning it upwards" such that the reflection will have the same angle to the normal as the original vector (but opposite directions):
 
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/8d5301ef-f899-4b7f-8209-f72838542ea6" />
+
+This is called [specular reflection](https://en.wikipedia.org/wiki/Specular_reflection).
 
 It's the "turning it upwards" part that requires some thinking. Below is the method I chose (IMPORTANT: all vector are of length 1, otherwise this DOES NOT work)
 
@@ -196,19 +198,27 @@ Okay, so far so good. Let's see what this looks like...
 
 <img width="400"  alt="image" src="https://github.com/user-attachments/assets/214f1e1c-b861-47e2-a660-b05736c6d5b6" />
 
-WOW! THAT'S EXACTLY THE SAME AS THE PREVIOUS TIME!
+WOW! NOTHING CHANGED!
 
-Why?
+Why is that?
 
-"Wait, wait! I think I know! It's because we're only looking at light that would reflect EXACTLY in the direction of the camera. But that's a tiny minority of reflections so it looks like there is no light at all!"
+"Wait, wait! I think I know! It's because we're only looking at light that would reflect EXACTLY in the direction of the camera. But given light only comes from one single direction, almost none of it will be reflected our way!"
 
 CORRECT!
+
+So given our single source of light, we still need a way to "spread" the light's reflection a bit. It's time to simulate [diffuse reflection](https://en.wikipedia.org/wiki/Diffuse_reflection).
+
+Real diffuse reflection occurs through surface roughness, and in larger part through scattering happening beneath the surface. That is, light tends to ricochet inside an object and come out in all manners of direction.
+
+Now, we could simulate that with our spheres, but it would be very expensive. So instead, we will use the dot product between the camera-to-sphere vector and the reflected vector. Provided they are both unit vectors, the result will lie between 0 and 1 - like a percentage!
 
 3. Project the tip of the reflected light onto the "camera's gaze" vector (the vector coming from the camera to the specific point of the sphere's surface);
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/f02ed27a-9de7-4e19-bb51-663516ce2288" />
 
 4. The projection should be between 0 and 1 unit away from the surface of the sphere. 
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/3c902578-dee1-4353-9e82-76887304fdc2" />
+
+5. Multiply this with the light's original intensity and you're all set.
 
 ### Making the sphere look rugged
 
