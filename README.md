@@ -10,7 +10,7 @@ A first attempt at making a raytracer form scratch using C.
 
 ### Start up
 
-Linux: just type `make`
+Linux: `make`
 
 # Write up
 
