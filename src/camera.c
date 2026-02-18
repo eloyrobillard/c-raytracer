@@ -17,6 +17,7 @@ void move_camera(RTCamera *camera, float delta) {
 
   Vec3 move = {direction_lr, 0, direction_fb};
 
+  move_with_x_rotation(&move, &camera->global_position, camera->global_rotation.x, delta * 100);
   move_with_y_rotation(&move, &camera->global_position, camera->global_rotation.y, delta * 100);
 }
 
@@ -35,5 +36,6 @@ void tilt_camera(RTCamera *camera, float delta) {
 
   Vec3 rotation = {tilt_v * delta, tilt_h * delta, 0};
 
+  camera->global_rotation.x += rotation.x;
   camera->global_rotation.y += rotation.y;
 }

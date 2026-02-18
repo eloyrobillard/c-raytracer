@@ -76,6 +76,14 @@ Vec3 *vec3_rotate_by_inplace(Vec3 *v, double angle_rad) {
   return vm_mul_inplace(&rot_mat, v);
 }
 
+Vec3 project_with_x_rotation(Vec3 *move, Vec3 *to_move, double x_rot, double dist) {
+  Vec3 unit_move = normalized(move);
+  Mat3 rot_mat = rot_x_mat(x_rot);
+  vm_mul_inplace(&rot_mat, &unit_move);
+  vec3_scalar_mul_inplace(&unit_move, dist);
+  return unit_move;
+}
+
 Vec3 project_with_y_rotation(Vec3 *move, Vec3 *to_move, double y_rot, double dist) {
   Vec3 unit_move = normalized(move);
   Mat3 rot_mat = rot_y_mat(y_rot);
@@ -84,9 +92,22 @@ Vec3 project_with_y_rotation(Vec3 *move, Vec3 *to_move, double y_rot, double dis
   return unit_move;
 }
 
+void move_with_x_rotation(Vec3 *move, Vec3 *to_move, double x_rot, double speed) {
+  Vec3 final_move = project_with_x_rotation(move, to_move, x_rot, speed);
+  vec3_add_inplace(to_move, &final_move);
+}
+
 void move_with_y_rotation(Vec3 *move, Vec3 *to_move, double y_rot, double speed) {
   Vec3 final_move = project_with_y_rotation(move, to_move, y_rot, speed);
   vec3_add_inplace(to_move, &final_move);
+}
+
+Vec3 rot_x_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad) {
+  Mat3 rotation = rot_x_mat(angle_rad);
+  Vec3 pos_to_point = vec3_difference(to_rotate, point);
+  vm_mul_inplace(&rotation, &pos_to_point);
+  Vec3 to_rotate_global = vec3_add(&pos_to_point, point);
+  return to_rotate_global;
 }
 
 Vec3 rot_y_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad) {
@@ -100,6 +121,11 @@ Vec3 rot_y_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad) {
 ///////////////////////////////////////////////////////////
 /////////////////////// MATRICES //////////////////////////
 ///////////////////////////////////////////////////////////
+
+Mat3 rot_x_mat(double angle_rad) {
+  Mat3 mat = {{1, 0, 0}, {0, cos(angle_rad), sin(angle_rad)}, {0, -sin(angle_rad), cos(angle_rad)}};
+  return mat;
+}
 
 Mat3 rot_y_mat(double angle_rad) {
   Mat3 mat = {{cos(angle_rad), 0, -sin(angle_rad)}, {0, 1, 0}, {sin(angle_rad), 0, cos(angle_rad)}};
