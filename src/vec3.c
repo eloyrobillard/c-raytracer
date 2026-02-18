@@ -93,16 +93,14 @@ Vec3 rot_x_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad) {
   Mat3 rotation = rot_x_mat(angle_rad);
   Vec3 pos_to_point = vec3_difference(to_rotate, point);
   vm_mul_inplace(&rotation, &pos_to_point);
-  Vec3 to_rotate_global = vec3_add(&pos_to_point, point);
-  return to_rotate_global;
+  return vec3_add(&pos_to_point, point);
 }
 
 Vec3 rot_y_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad) {
   Mat3 rotation = rot_y_mat(angle_rad);
   Vec3 pos_to_point = vec3_difference(to_rotate, point);
   vm_mul_inplace(&rotation, &pos_to_point);
-  Vec3 to_rotate_global = vec3_add(&pos_to_point, point);
-  return to_rotate_global;
+  return vec3_add(&pos_to_point, point);
 }
 
 ///////////////////////////////////////////////////////////
@@ -110,11 +108,9 @@ Vec3 rot_y_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad) {
 ///////////////////////////////////////////////////////////
 
 Mat3 rot_x_mat(double angle_rad) {
-  Mat3 mat = {{1, 0, 0}, {0, cos(angle_rad), sin(angle_rad)}, {0, -sin(angle_rad), cos(angle_rad)}};
-  return mat;
+  return (Mat3){{1, 0, 0}, {0, cos(angle_rad), sin(angle_rad)}, {0, -sin(angle_rad), cos(angle_rad)}};
 }
 
 Mat3 rot_y_mat(double angle_rad) {
-  Mat3 mat = {{cos(angle_rad), 0, -sin(angle_rad)}, {0, 1, 0}, {sin(angle_rad), 0, cos(angle_rad)}};
-  return mat;
+  return (Mat3){{cos(angle_rad), 0, -sin(angle_rad)}, {0, 1, 0}, {sin(angle_rad), 0, cos(angle_rad)}};
 }
