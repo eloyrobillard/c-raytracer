@@ -219,6 +219,3 @@ Now, we could simulate that with our spheres, but it would be very expensive. So
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/3c902578-dee1-4353-9e82-76887304fdc2" />
 
 5. Multiply this with the light's original intensity and you're all set.
-
-### Making the sphere look rugged
-
