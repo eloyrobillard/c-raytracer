@@ -64,7 +64,10 @@ Vec3 vm_mul(Mat3 *mat, Vec3 *v) {
 }
 
 Vec3 *vm_mul_inplace(Mat3 *mat, Vec3 *v) {
-  v->x = vec3_dot(&mat->_0, v), v->y = vec3_dot(&mat->_1, v), v->z = vec3_dot(&mat->_2, v);
+  double x = vec3_dot(&mat->_0, v);
+  double y = vec3_dot(&mat->_1, v);
+  double z = vec3_dot(&mat->_2, v);
+  v->x = x, v->y = y, v->z = z;
   return v;
 }
 
@@ -90,7 +93,8 @@ Vec3 rot_y_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad) {
   Mat3 rotation = rot_y_mat(angle_rad);
   Vec3 pos_to_point = vec3_difference(to_rotate, point);
   vm_mul_inplace(&rotation, &pos_to_point);
-  return vec3_add(&pos_to_point, point);
+  Vec3 to_rotate_global = vec3_add(&pos_to_point, point);
+  return to_rotate_global;
 }
 
 ///////////////////////////////////////////////////////////
@@ -98,6 +102,6 @@ Vec3 rot_y_around_point(Vec3 *point, Vec3 *to_rotate, double angle_rad) {
 ///////////////////////////////////////////////////////////
 
 Mat3 rot_y_mat(double angle_rad) {
-  Mat3 mat = {{sin(angle_rad), 0, cos(angle_rad)}, {0, 1, 0}, {cos(angle_rad), 0, sin(angle_rad)}};
+  Mat3 mat = {{cos(angle_rad), 0, -sin(angle_rad)}, {0, 1, 0}, {sin(angle_rad), 0, cos(angle_rad)}};
   return mat;
 }

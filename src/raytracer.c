@@ -77,7 +77,8 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, RTCamera *camera, Wor
     for (int y = -halfScreenHeight; y < halfScreenHeight; y++) {
       Vec3 direction = {camera->global_position.x + x, camera->global_position.y + y,
                         camera->global_position.z + halfScreenWidth};
-      Vec3 final_direction = rot_y_around_point(&camera->global_position, &direction, camera->global_rotation.y);
+      Vec3 final_direction =
+          rot_y_around_point(&camera->global_position, &direction, camera->global_rotation.y - PI / 2.0);
       const Vec3 v = vec3_difference(&final_direction, &camera->global_position);
 
       double min_lambda = INFINITY;
