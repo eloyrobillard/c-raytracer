@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "utils.h"
 #include "vec3.h"
 #include <raylib.h>
 
@@ -35,6 +36,6 @@ void tilt_camera(RTCamera *camera, float delta) {
 
   Vec3 rotation = {tilt_v * delta, tilt_h * delta, 0};
 
-  camera->global_rotation.x += rotation.x;
+  camera->global_rotation.x = clamp(camera->global_rotation.x + rotation.x, -1.5, 1.5);
   camera->global_rotation.y += rotation.y;
 }
