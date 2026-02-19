@@ -109,9 +109,9 @@ If :
 - $\Delta = 0$: R is tangent to the sphere
 - $\Delta > 0$: R goes in and out of the sphere, intersecting it's surface in two points
 
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/1fcd3107-cb3f-4b98-b95c-6abd1e97f262" />
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/43390a49-c849-4145-8482-1048b9de140f" />
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/20da5f9f-cf1a-46d2-a26e-7b2f8bf87702" />
+<img height="183" alt="image" src="https://github.com/user-attachments/assets/1fcd3107-cb3f-4b98-b95c-6abd1e97f262" />
+<img width="250" alt="image" src="https://github.com/user-attachments/assets/43390a49-c849-4145-8482-1048b9de140f" />
+<img width="250" alt="image" src="https://github.com/user-attachments/assets/20da5f9f-cf1a-46d2-a26e-7b2f8bf87702" />
 
 
 
