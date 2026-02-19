@@ -202,11 +202,9 @@ Why is that?
 
 CORRECT!
 
-So given our single source of light, we still need a way to "spread" the light's reflection a bit. It's time to simulate [diffuse reflection](https://en.wikipedia.org/wiki/Diffuse_reflection).
+So given our single source of light, we still need a way to "spread" the light's reflection a bit.
 
-Real diffuse reflection occurs through surface roughness, and in larger part through scattering happening beneath the surface. That is, light tends to ricochet inside an object and come out in all manners of direction.
-
-Now, we could simulate that with our spheres, but it would be very expensive. So instead, we will use the dot product between the camera-to-sphere vector and the reflected vector. Provided they are both unit vectors, the result will lie between 0 and 1 - like a percentage!
+We will use the dot product between the camera-to-sphere vector and the reflected vector. Provided they are both unit vectors, the result will lie between 0 and 1 - like a percentage!
 
 3. Project the tip of the reflected light onto the "camera's gaze" vector (the vector coming from the camera to the specific point of the sphere's surface);
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/f02ed27a-9de7-4e19-bb51-663516ce2288" />
@@ -214,4 +212,4 @@ Now, we could simulate that with our spheres, but it would be very expensive. So
 4. The projection should be between 0 and 1 unit away from the surface of the sphere. 
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/3c902578-dee1-4353-9e82-76887304fdc2" />
 
-5. Multiply this with the light's original intensity and you're all set.
+5. Multiply this with the light's original intensity and you've got your specular lighting all set.
