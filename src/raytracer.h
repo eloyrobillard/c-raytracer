@@ -8,6 +8,10 @@ typedef enum { SPHERE, SQUARE, PLANE } ObjectType;
 typedef enum { DIRECTIONAL } LightType;
 
 typedef struct {
+  Shader lighting_shader;
+} Resources;
+
+typedef struct {
   ObjectType type;
   Vec3 pos_center; // used by spheres, squares and planes (in which case it
                    // is just any point on the plane)
