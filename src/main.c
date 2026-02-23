@@ -75,7 +75,9 @@ int main(int argc, char **argv) {
   int ambientLoc = GetShaderLocation(resources.lighting_shader, "ambient");
   SetShaderValue(resources.lighting_shader, ambientLoc, (float[4]){0.2f, 0.2f, 0.2f, 1.0f}, SHADER_UNIFORM_VEC4);
 
-  CreateLight(LIGHT_DIRECTIONAL, (Vector3){-1000, -1000, -1000}, Vector3Zero(), RAYWHITE, resources.lighting_shader);
+  CreateLight(LIGHT_DIRECTIONAL, (Vector3){-1000, -1000, -1000}, Vector3Zero(), WHITE, resources.lighting_shader);
+
+  Mesh cube = GenMeshCube(100.0f, 100.0f, 100.0f);
 
   while (!WindowShouldClose()) {
     UpdateCamera(&cam3d, CAMERA_ORBITAL);
@@ -90,6 +92,8 @@ int main(int argc, char **argv) {
     ClearBackground(BLACK);
 
     BeginMode3D(cam3d);
+
+    DrawMesh(cube, materials[0], MatrixTranslate(-240.0f, 160.0f, 0.0f));
 
     for (int i = 0; i < world.num_objects; i++) {
       DrawMesh(meshes[i], materials[i], transforms[i]);
