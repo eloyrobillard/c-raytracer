@@ -49,7 +49,7 @@ Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, c
   return reflected_vector;
 }
 
-double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sphere_center, const Light *light) {
+double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sphere_center, const RTLight *light) {
   const Vec3 normal = vec3_difference(point, sphere_center);
   const Vec3 unit_normal = normalized(&normal);
 
@@ -103,7 +103,7 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, RTCamera *camera, Wor
 
       if (min_lambda < INFINITY) {
         for (int i = 0; i < world->num_lights; i++) {
-          Light *light = &world->lights[i];
+          RTLight *light = &world->lights[i];
           Vec3 point = vec3_scalar_mul(&v, min_lambda);
           double light_intensity_ratio =
               compute_light_intensity_ratio_at_point(&point, &camera_to_sphere_center, light);

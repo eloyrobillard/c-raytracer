@@ -2,6 +2,9 @@
 #include "raytracer.h"
 #include <raylib.h>
 #include <raymath.h>
+
+#define RLIGHTS_IMPLEMENTATION
+#include <rlights.h>
 #include <stdlib.h>
 
 int main(int argc, char **argv) {
@@ -33,7 +36,7 @@ int main(int argc, char **argv) {
                           .radius = 125,
                       }};
 
-  Light lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 120.0}};
+  RTLight lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 120.0}};
 
   World world = {.objects = objects, .num_objects = 3, .lights = lights, .num_lights = 1};
 
@@ -72,6 +75,8 @@ int main(int argc, char **argv) {
   int ambientLoc = GetShaderLocation(resources.lighting_shader, "ambient");
   SetShaderValue(resources.lighting_shader, ambientLoc, (float[4]){0.2f, 0.2f, 0.2f, 1.0f}, SHADER_UNIFORM_VEC4);
 
+  CreateLight(LIGHT_DIRECTIONAL, (Vector3){-1000, -1000, -1000}, Vector3Zero(), RAYWHITE, resources.lighting_shader);
+
   while (!WindowShouldClose()) {
     UpdateCamera(&cam3d, CAMERA_ORBITAL);
 
@@ -82,7 +87,7 @@ int main(int argc, char **argv) {
 
     BeginDrawing();
 
-    ClearBackground(RAYWHITE);
+    ClearBackground(BLACK);
 
     BeginMode3D(cam3d);
 
