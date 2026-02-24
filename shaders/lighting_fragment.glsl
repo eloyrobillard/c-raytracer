@@ -12,8 +12,6 @@ uniform vec4 colDiffuse;
 // Output fragment color
 out vec4 finalColor;
 
-// NOTE: Add your custom variables here
-
 #define     MAX_LIGHTS              1
 #define     LIGHT_DIRECTIONAL       0
 #define     LIGHT_POINT             1
@@ -35,12 +33,10 @@ void main()
 {
   vec3 lightDot = vec3(0.0);
   vec3 normal = normalize(fragNormal);
-  // vec3 viewD = normalize(viewPos - fragPosition);
-  // vec3 specular = vec3(0.0);
+  vec3 viewD = normalize(viewPos - fragPosition);
+  vec3 specular = vec3(0.0);
 
   vec4 tint = colDiffuse * fragColor;
-
-  // NOTE: Implement here your fragment shader code
 
   for (int i = 0; i < MAX_LIGHTS; i++)
   {
@@ -53,23 +49,14 @@ void main()
         light = -normalize(lights[i].target - lights[i].position);
       }
 
-      //     if (lights[i].type == LIGHT_POINT)
-      //     {
-      //       light = normalize(lights[i].position - fragPosition);
-      //     }
-
       float NdotL = max(dot(normal, light), 0.0);
       lightDot += lights[i].color.rgb * NdotL;
 
-      //     float specCo = 0.0;
-      //     if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), normal))), 16.0); // 16 refers to shine
-      //     specular += specCo;
+      float specCo = 0.0;
+      if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), normal))), 32.0); // 32 refers to shine
+      specular += specCo;
     }
   }
 
-  // finalColor = (texelColor * ((tint + vec4(specular, 1.0)) * vec4(lightDot, 1.0)));
-  finalColor = vec4(lightDot, 1.0) + ambient * tint;
-
-  // // Gamma correction
-  // finalColor = pow(finalColor, vec4(1.0 / 2.2));
+  finalColor = (vec4(specular, 1.0) + vec4(lightDot, 1.0) + ambient) * tint;
 }

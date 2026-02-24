@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
   int ambientLoc = GetShaderLocation(resources.lighting_shader, "ambient");
   SetShaderValue(resources.lighting_shader, ambientLoc, (float[4]){0.2f, 0.2f, 0.2f, 1.0f}, SHADER_UNIFORM_VEC4);
 
-  CreateLight(LIGHT_DIRECTIONAL, (Vector3){-1000, -1000, -1000}, Vector3Zero(), WHITE, resources.lighting_shader);
+  CreateLight(LIGHT_DIRECTIONAL, (Vector3){-10, 10, -10}, Vector3Zero(), WHITE, resources.lighting_shader);
 
   Mesh cube = GenMeshCube(100.0f, 100.0f, 100.0f);
 
