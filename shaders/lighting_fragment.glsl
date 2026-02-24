@@ -43,6 +43,7 @@ void main()
     if (lights[i].enabled == 1)
     {
       vec3 light = vec3(0.0);
+      vec3 lightColor = lights[i].color.rgb;
 
       if (lights[i].type == LIGHT_DIRECTIONAL)
       {
@@ -50,13 +51,13 @@ void main()
       }
 
       float NdotL = max(dot(normal, light), 0.0);
-      lightDot += lights[i].color.rgb * NdotL;
+      lightDot += lightColor * NdotL;
 
       float specCo = 0.0;
       if (NdotL > 0.0) specCo = pow(max(0.0, dot(viewD, reflect(-(light), normal))), 32.0); // 32 refers to shine
-      specular += specCo;
+      specular += lightColor * specCo;
     }
   }
 
-  finalColor = (vec4(specular, 1.0) + vec4(lightDot, 1.0) + ambient) * tint;
+  finalColor = (5 * vec4(specular, 1.0) + vec4(lightDot, 1.0) + ambient) * tint;
 }
