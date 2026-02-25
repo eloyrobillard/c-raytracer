@@ -5,7 +5,6 @@
 
 #define RLIGHTS_IMPLEMENTATION
 #include <rlights.h>
-#include <stdlib.h>
 
 int main(int argc, char **argv) {
   const int screenWidth = 1920;
@@ -40,11 +39,9 @@ int main(int argc, char **argv) {
 
   World world = {.objects = objects, .num_objects = 3, .lights = lights, .num_lights = 1};
 
-  Resources resources = {.lighting_shader =
-                             LoadShader("shaders/lighting_vertex.glsl", "shaders/lighting_fragment.glsl")};
-
-  resources.lighting_shader.locs[SHADER_LOC_MATRIX_MVP] = GetShaderLocation(resources.lighting_shader, "mvp");
-  resources.lighting_shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(resources.lighting_shader, "viewPos");
+  Shader ray_shader = LoadShader(0, "shaders/ray_f.glsl");
+  ray_shader.locs[SHADER_LOC_MATRIX_MVP] = GetShaderLocation(ray_shader, "mvp");
+  ray_shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(ray_shader, "viewPos");
 
   Camera cam3d = {0};
   cam3d.position =
@@ -54,67 +51,32 @@ int main(int argc, char **argv) {
   cam3d.fovy = 45.0f;                         // Camera field-of-view Y
   cam3d.projection = CAMERA_PERSPECTIVE;
 
-  Matrix *transforms = (Matrix *)calloc(world.num_objects, sizeof(Matrix));
-  Mesh *meshes = (Mesh *)calloc(world.num_objects, sizeof(Mesh));
-  Material *materials = (Material *)calloc(world.num_objects, sizeof(Material));
-  for (int i = 0; i < world.num_objects; i++) {
-    Object obj = world.objects[i];
-
-    Matrix translation = MatrixTranslate(obj.pos_center.x, obj.pos_center.y, obj.pos_center.z);
-    transforms[i] = translation;
-
-    Mesh mesh = GenMeshSphere(obj.radius, 100, 100);
-    meshes[i] = mesh;
-
-    Material mat = LoadMaterialDefault();
-    mat.shader = resources.lighting_shader;
-    mat.maps[MATERIAL_MAP_DIFFUSE].color = obj.color;
-    materials[i] = mat;
-  }
-
-  int ambientLoc = GetShaderLocation(resources.lighting_shader, "ambient");
-  SetShaderValue(resources.lighting_shader, ambientLoc, (float[4]){0.2f, 0.2f, 0.2f, 1.0f}, SHADER_UNIFORM_VEC4);
-
-  CreateLight(LIGHT_DIRECTIONAL, (Vector3){-10, 10, -10}, Vector3Zero(), WHITE, resources.lighting_shader);
-
-  Mesh cube = GenMeshCube(100.0f, 100.0f, 100.0f);
-
   while (!WindowShouldClose()) {
     UpdateCamera(&cam3d, CAMERA_ORBITAL);
 
     // Update the light shader with the camera view position
     float cameraPos[3] = {cam3d.position.x, cam3d.position.y, cam3d.position.z};
-    SetShaderValue(resources.lighting_shader, resources.lighting_shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos,
-                   SHADER_UNIFORM_VEC3);
+    SetShaderValue(ray_shader, ray_shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
+
+    Vector2 resolutionVec = {(float)GetRenderWidth(), (float)GetRenderHeight()};
+    SetShaderValue(ray_shader, GetShaderLocation(ray_shader, "resolution"), &resolutionVec, SHADER_UNIFORM_VEC2);
 
     BeginDrawing();
 
     ClearBackground(BLACK);
 
-    BeginMode3D(cam3d);
+    BeginShaderMode(ray_shader);
 
-    DrawMesh(cube, materials[0], MatrixTranslate(-240.0f, 160.0f, 0.0f));
+    DrawRectangle(0, 0, screenWidth, screenHeight, WHITE);
 
-    for (int i = 0; i < world.num_objects; i++) {
-      DrawMesh(meshes[i], materials[i], transforms[i]);
-    }
-
-    // tilt_camera(&camera, GetFrameTime());
-    // move_camera(&camera, GetFrameTime());
-
-    // trace_rays(halfWidth, halfHeight, &camera, &world);
-
-    EndMode3D();
+    EndShaderMode();
 
     DrawFPS(10, 10);
 
     EndDrawing();
   }
 
-  UnloadShader(resources.lighting_shader);
-  free(transforms);
-  free(meshes);
-  free(materials);
+  UnloadShader(ray_shader);
 
   CloseWindow();
 
