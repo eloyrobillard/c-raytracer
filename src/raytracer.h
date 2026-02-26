@@ -11,7 +11,7 @@ typedef struct {
   ObjectType type;
   Vec3 pos_center; // used by spheres, squares and planes (in which case it
                    // is just any point on the plane)
-  int radius;      // used by spheres
+  float radius;    // used by spheres
   Vec3 normal;     // used by planes and squares
   Vec3 normal2;    // used by squares
   Color color;
