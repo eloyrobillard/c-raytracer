@@ -18,21 +18,21 @@ int main(int argc, char **argv) {
   RTCamera camera = {.global_position = {0, 0, -halfWidth}, .global_rotation = {0, 0, 0}};
   Object objects[] = {{
                           .type = SPHERE,
-                          .pos_center = {.x = 0, .y = 0, .z = 0},
+                          .pos_center = {.x = 0, .y = 0, .z = 150},
                           .color = RED,
-                          .radius = 2,
+                          .radius = 500,
                       },
                       {
                           .type = SPHERE,
-                          .pos_center = {.x = 5, .y = 5, .z = 0},
+                          .pos_center = {.x = 540, .y = 360, .z = 250},
                           .color = BROWN,
-                          .radius = 2,
+                          .radius = 300,
                       },
                       {
                           .type = SPHERE,
-                          .pos_center = {.x = -5, .y = -5, .z = 0},
+                          .pos_center = {.x = -540, .y = -360, .z = 5},
                           .color = BLUE,
-                          .radius = 2,
+                          .radius = 300,
                       }};
 
   RTLight lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 120.0}};
@@ -59,6 +59,11 @@ int main(int argc, char **argv) {
     SetShaderValue(shader, colorLoc, sphereColor, SHADER_UNIFORM_VEC3);
   }
 
+  SetShaderValue(shader, GetShaderLocation(shader, "ambient"), (float[3]){0.2f, 0.2f, 0.2f}, SHADER_UNIFORM_VEC3);
+
+  CreateLight(LIGHT_DIRECTIONAL, (Vector3){-1.0f, -1.0f, -1.0f}, (Vector3){0.0f, 0.0f, 0.0f},
+              (Color){255.0f, 255.0f, 255.0f, 255.0f}, shader);
+
   Camera cam3d = {0};
   cam3d.position =
       (Vector3){camera.global_position.x, camera.global_position.y, camera.global_position.z}; // Camera position
@@ -72,7 +77,7 @@ int main(int argc, char **argv) {
 
     // Update the light shader with the camera view position
     // float cameraPos[3] = {cam3d.position.x, cam3d.position.y, cam3d.position.z};
-    // SetShaderValue(ray_shader, ray_shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
+    // SetShaderValue(shader, shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
 
     Vector2 resolutionVec = {(float)screenWidth, (float)screenHeight};
     SetShaderValue(shader, GetShaderLocation(shader, "resolution"), &resolutionVec, SHADER_UNIFORM_VEC2);
