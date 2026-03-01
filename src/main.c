@@ -1,4 +1,3 @@
-#include "camera.h"
 #include "raytracer.h"
 #include <raylib.h>
 #include <raymath.h>
@@ -15,10 +14,9 @@ int main(int argc, char **argv) {
   InitWindow(screenWidth, screenHeight, "Raytracer");
   SetTargetFPS(60);
 
-  RTCamera camera = {.global_position = {0, 0, -halfWidth}, .global_rotation = {0, 0, 0}};
   Object objects[] = {{
                           .type = SPHERE,
-                          .pos_center = {.x = 0, .y = 0, .z = 150},
+                          .pos_center = {.x = 0, .y = 0, .z = 0},
                           .color = RED,
                           .radius = 500,
                       },
@@ -41,7 +39,7 @@ int main(int argc, char **argv) {
 
   Shader shader = LoadShader(0, "shaders/ray_f.glsl");
   // ray_shader.locs[SHADER_LOC_MATRIX_MVP] = GetShaderLocation(ray_shader, "mvp");
-  // ray_shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(ray_shader, "viewPos");
+  shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
 
   for (int si = 0; si < world.num_objects; si++) {
     Object sphere = world.objects[si];
@@ -64,20 +62,19 @@ int main(int argc, char **argv) {
   CreateLight(LIGHT_DIRECTIONAL, (Vector3){-1.0f, -1.0f, -1.0f}, (Vector3){0.0f, 0.0f, 0.0f},
               (Color){255.0f, 255.0f, 255.0f, 255.0f}, shader);
 
-  Camera cam3d = {0};
-  cam3d.position =
-      (Vector3){camera.global_position.x, camera.global_position.y, camera.global_position.z}; // Camera position
-  cam3d.target = (Vector3){0.0f, 0.0f, 0.0f}; // Camera looking at point
-  cam3d.up = (Vector3){0.0f, 1.0f, 0.0f};     // Camera up vector (rotation towards target)
-  cam3d.fovy = 45.0f;                         // Camera field-of-view Y
-  cam3d.projection = CAMERA_PERSPECTIVE;
+  Camera camera = {0};
+  camera.position = (Vector3){0.0f, 0.0f, -(float)halfWidth}; // Camera position
+  camera.target = (Vector3){0.0f, 0.0f, 0.0f};                // Camera looking at point
+  camera.up = (Vector3){0.0f, 1.0f, 0.0f};                    // Camera up vector (rotation towards target)
+  camera.fovy = 45.0f;                                        // Camera field-of-view Y
+  camera.projection = CAMERA_PERSPECTIVE;
 
   while (!WindowShouldClose()) {
-    // UpdateCamera(&cam3d, CAMERA_ORBITAL);
+    UpdateCamera(&camera, CAMERA_ORBITAL);
 
     // Update the light shader with the camera view position
-    // float cameraPos[3] = {cam3d.position.x, cam3d.position.y, cam3d.position.z};
-    // SetShaderValue(shader, shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
+    float cameraPos[3] = {camera.position.x, camera.position.y, camera.position.z};
+    SetShaderValue(shader, shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
 
     Vector2 resolutionVec = {(float)screenWidth, (float)screenHeight};
     SetShaderValue(shader, GetShaderLocation(shader, "resolution"), &resolutionVec, SHADER_UNIFORM_VEC2);
@@ -86,11 +83,13 @@ int main(int argc, char **argv) {
 
     ClearBackground(BLACK);
 
+    BeginMode3D(camera);
     BeginShaderMode(shader);
 
-    DrawRectangle(0, 0, screenWidth, screenHeight, WHITE);
+    DrawRectangle(-screenWidth / 2, -screenHeight / 2, screenWidth, screenHeight, WHITE);
 
     EndShaderMode();
+    EndMode3D();
 
     DrawFPS(10, 10);
 
