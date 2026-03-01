@@ -22,13 +22,13 @@ int main(int argc, char **argv) {
                       },
                       {
                           .type = SPHERE,
-                          .pos_center = {.x = 540, .y = 360, .z = 250},
+                          .pos_center = {.x = 500, .y = 500, .z = 250},
                           .color = BROWN,
                           .radius = 300,
                       },
                       {
                           .type = SPHERE,
-                          .pos_center = {.x = -540, .y = -360, .z = 5},
+                          .pos_center = {.x = -500, .y = -500, .z = -250},
                           .color = BLUE,
                           .radius = 300,
                       }};

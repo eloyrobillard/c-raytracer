@@ -53,7 +53,8 @@ void main(void) {
   Ray ray;
   ray.origin = viewPos;
   float theta = viewPos.x == 0.0f ? -sign(viewPos.z) * PI / 2.0f : atan(-viewPos.z, -viewPos.x);
-  ray.direction = normalize(vec3(sin(theta) * p.x + cos(theta) * -viewPos.z, p.y, cos(theta) * p.x + sin(theta) * -viewPos.z));
+  vec3 p_rotated = vec3(-sin(theta) * p.x, p.y, cos(theta) * p.x);
+  ray.direction = normalize(p_rotated - viewPos);
 
   vec3 destColor = vec3(0.0);
   float closestIntersection = -1;
