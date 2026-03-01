@@ -7,7 +7,7 @@
 /////////////////////// VECTORS ///////////////////////////
 ///////////////////////////////////////////////////////////
 
-void print_vec3(const Vec3 *v) { printf("x: %f y: %f z: %f\n", v->x, v->y, v->z); }
+void print_vec3(Vec3 *v) { printf("x: %f y: %f z: %f\n", v->x, v->y, v->z); }
 
 Vec3 vec3_add(const Vec3 *v1, const Vec3 *v2) {
   Vec3 v = {v1->x + v2->x, v1->y + v2->y, v1->z + v2->z};
