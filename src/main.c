@@ -83,13 +83,11 @@ int main(int argc, char **argv) {
 
     ClearBackground(BLACK);
 
-    BeginMode3D(camera);
     BeginShaderMode(shader);
 
-    DrawRectangle(-screenWidth / 2, -screenHeight / 2, screenWidth, screenHeight, WHITE);
+    DrawRectangle(0, 0, screenWidth, screenHeight, WHITE);
 
     EndShaderMode();
-    EndMode3D();
 
     DrawFPS(10, 10);
 
