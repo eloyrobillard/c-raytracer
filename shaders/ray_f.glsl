@@ -1,5 +1,7 @@
 #version 330
 
+#define PI 3.14159265359
+
 uniform vec2 resolution;
 uniform vec3 ambient;
 uniform vec3 viewPos;
@@ -46,13 +48,12 @@ float intersectSphere(Ray R, Sphere S) {
 
 void main(void) {
   // shift origin to center of screen (coordinates still grow downward)
-  // normalize coordinates so that ???
-  vec2 p = (gl_FragCoord.xy * 2 - resolution);
+  vec2 p = gl_FragCoord.xy * 2 - resolution;
 
   Ray ray;
   ray.origin = viewPos;
-  float theta = atan(-viewPos.z, -viewPos.x);
-  ray.direction = normalize(vec3(cos(theta) * -viewPos.x + sin(theta) * p.x, p.y, cos(theta) * -p.x + sin(theta) * -viewPos.z));
+  float theta = viewPos.x == 0.0f ? -sign(viewPos.z) * PI / 2.0f : atan(-viewPos.z, -viewPos.x);
+  ray.direction = normalize(vec3(sin(theta) * p.x + cos(theta) * -viewPos.z, p.y, cos(theta) * p.x + sin(theta) * -viewPos.z));
 
   vec3 destColor = vec3(0.0);
   float closestIntersection = -1;
