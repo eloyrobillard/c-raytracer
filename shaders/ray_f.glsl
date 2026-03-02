@@ -33,7 +33,7 @@ uniform Sphere spheres[3];
 
 float intersectSphere(Ray R, Sphere S) {
   float a = dot(R.direction, R.direction);
-  float b = 2 * dot(R.direction, R.origin - S.position);
+  float b = -2 * dot(R.direction, S.position - R.origin);
   float c = dot(R.origin - S.position, R.origin - S.position) - (S.radius * S.radius);
   float d = b * b - 4 * a * c;
 
