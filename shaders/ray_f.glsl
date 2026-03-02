@@ -89,5 +89,10 @@ void main(void) {
     }
   }
 
-  gl_FragColor = vec4((ambient + diffuse + specular) * destColor, 1.0);
+  if (intersectedSphere != -1) {
+    gl_FragColor = vec4((ambient + diffuse + 2 * specular) * destColor, 1.0);
+  } else {
+    float norm_y = (gl_FragCoord.y / resolution.y);
+    gl_FragColor = vec4((1 - norm_y) * vec3(1), 1) + vec4(norm_y * vec3(0.5, 0.7, 1), 1);
+  }
 }
