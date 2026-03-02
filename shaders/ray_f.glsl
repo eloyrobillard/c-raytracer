@@ -87,9 +87,8 @@ void main(void) {
         specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersectionPoint)), 0.0), 32.0);
       }
     }
-  }
 
-  if (intersectedSphere != -1) {
+    destColor = 0.5 * vec3(normal.x + destColor.x + 1, normal.y + destColor.y + 1, normal.z + destColor.z + 1);
     gl_FragColor = vec4((ambient + diffuse + 2 * specular) * destColor, 1.0);
   } else {
     float norm_y = (gl_FragCoord.y / resolution.y);
