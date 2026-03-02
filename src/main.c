@@ -1,4 +1,5 @@
 #include "raytracer.h"
+#include <math.h>
 #include <raylib.h>
 #include <raymath.h>
 
@@ -22,15 +23,15 @@ int main(int argc, char **argv) {
                       },
                       {
                           .type = SPHERE,
-                          .pos_center = {.x = 500, .y = 500, .z = 250},
+                          .pos_center = {.x = 300, .y = 300, .z = 250},
                           .color = BROWN,
-                          .radius = 300,
+                          .radius = 200,
                       },
                       {
                           .type = SPHERE,
-                          .pos_center = {.x = -500, .y = -500, .z = -250},
+                          .pos_center = {.x = -300, .y = -300, .z = -250},
                           .color = BLUE,
-                          .radius = 300,
+                          .radius = 200,
                       }};
 
   RTLight lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 120.0}};
@@ -69,8 +70,18 @@ int main(int argc, char **argv) {
   camera.fovy = 45.0f;                                        // Camera field-of-view Y
   camera.projection = CAMERA_PERSPECTIVE;
 
+  const int SPEED = 4;
   while (!WindowShouldClose()) {
+    float direction_fb = 0;
+    if (IsKeyDown(KEY_S))
+      direction_fb += 1;
+    if (IsKeyDown(KEY_W))
+      direction_fb -= 1;
+
     UpdateCamera(&camera, CAMERA_ORBITAL);
+    double theta = atan2(camera.position.z, camera.position.x);
+    camera.position.x += cos(theta) * direction_fb * SPEED;
+    camera.position.z += sin(theta) * direction_fb * SPEED;
 
     // Update the light shader with the camera view position
     float cameraPos[3] = {camera.position.x, camera.position.y, camera.position.z};
