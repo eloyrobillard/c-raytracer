@@ -79,7 +79,7 @@ void main(void) {
     for (int li = 0; li < MAX_LIGHTS; li++) {
       Light light = lights[li];
       if (light.enabled == 1) {
-        vec3 lightColor = vec3(light.color[0], light.color[1], light.color[2]) * light.color[3];
+        vec3 lightColor = vec3(light.color[0], light.color[1], light.color[2]);
 
         diffuse += lightColor * max(dot(-normalize(light.target - light.position), normal), 0.0);
 
