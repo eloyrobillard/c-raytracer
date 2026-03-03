@@ -119,7 +119,6 @@ void main(void) {
       vec3 p_rotated = vec3(-sin(theta) * (p.x + x), (p.y + y), cos(theta) * (p.x + x));
       ray.direction = normalize(p_rotated - viewPos);
 
-      int intersectedSphere = -1;
       HitInfo intersection;
       intersection.hit = false;
       intersection.t = TMAX;
@@ -130,7 +129,6 @@ void main(void) {
         if (hinfo.hit && (hinfo.t < intersection.t || !hinfo.hit)) {
           intersection = hinfo;
           destColor = spheres[si].color;
-          intersectedSphere = si;
         }
       }
 
