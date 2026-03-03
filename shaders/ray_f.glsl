@@ -31,19 +31,36 @@ uniform Light lights[MAX_LIGHTS];
 
 uniform Sphere spheres[3];
 
-float intersectSphere(Ray R, Sphere S) {
+struct hit_info {
+  bool hit;
+  float t;
+};
+
+hit_info intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
+  hit_info hinfo;
+  hinfo.hit = false;
+  hinfo.t = 0.0f;
+
   float a = dot(R.direction, R.direction);
   float b = -2 * dot(R.direction, S.position - R.origin);
   float c = dot(R.origin - S.position, R.origin - S.position) - (S.radius * S.radius);
   float d = b * b - 4 * a * c;
 
   if (d > 0.0) {
-    float t = (-b - sqrt(d)) / (2 * a);
-    if (t > 0.0)
-      return t;
+    float sqrtd = sqrt(d);
+    float t = (-b - sqrtd) / (2 * a);
+    if (t <= tmin || tmax <= t) {
+      t = (-b + sqrtd) / (2 * a);
+      if (t <= tmin || tmax <= t) {
+        return hinfo;
+      }
+    }
+
+    hinfo.hit = true;
+    hinfo.t = t;
   }
 
-  return 0.0;
+  return hinfo;
 }
 
 void main(void) {
@@ -62,11 +79,11 @@ void main(void) {
   int intersectedSphere = -1;
 
   for (int si = 0; si < 3; si++) {
-    float t = intersectSphere(ray, spheres[si]);
-    if (t > 0.0 && (t < closestIntersection || closestIntersection == -1)) {
-      closestIntersection = t;
+    hit_info hinfo = intersectSphere(ray, spheres[si], 0.0f, 3000.0f);
+    if (hinfo.hit && (hinfo.t < closestIntersection || closestIntersection == -1)) {
+      closestIntersection = hinfo.t;
       destColor = spheres[si].color;
-      intersectionPoint = ray.origin + ray.direction * t;
+      intersectionPoint = ray.origin + ray.direction * hinfo.t;
       intersectedSphere = si;
     }
   }
