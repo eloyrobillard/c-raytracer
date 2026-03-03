@@ -1,6 +1,12 @@
 #version 330
 
+// number of samples used for antialiasing
+// prefer to use odd numbers
+#define AA_ROWS 3
+#define AA_COLS 3
+
 #define TMAX 3000.0f
+
 #define PI 3.14159265359
 
 uniform vec2 resolution;
@@ -73,51 +79,60 @@ HitInfo intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
 }
 
 void main(void) {
-  // shift origin to center of screen (coordinates still grow downward)
-  vec2 p = gl_FragCoord.xy * 2 - resolution;
+  vec3 color = vec3(0.0);
 
-  Ray ray;
-  ray.origin = viewPos;
-  float theta = viewPos.x == 0.0f ? -sign(viewPos.z) * PI / 2.0f : atan(-viewPos.z, -viewPos.x);
-  vec3 p_rotated = vec3(-sin(theta) * p.x, p.y, cos(theta) * p.x);
-  ray.direction = normalize(p_rotated - viewPos);
+  for (int y = -(AA_ROWS / 2); y <= AA_ROWS / 2; y++) {
+    for (int x = -(AA_COLS / 2); x <= AA_COLS / 2; x++) {
+      // shift origin to center of screen (coordinates still grow downward)
+      vec2 p = gl_FragCoord.xy * 2 - resolution;
 
-  vec3 destColor = vec3(0.0);
-  int intersectedSphere = -1;
-  HitInfo intersection;
-  intersection.hit = false;
-  intersection.t = TMAX;
+      Ray ray;
+      ray.origin = viewPos;
+      float theta = viewPos.x == 0.0f ? -sign(viewPos.z) * PI / 2.0f : atan(-viewPos.z, -viewPos.x);
+      vec3 p_rotated = vec3(-sin(theta) * (p.x + x), (p.y + y), cos(theta) * (p.x + x));
+      ray.direction = normalize(p_rotated - viewPos);
 
-  for (int si = 0; si < 3; si++) {
-    HitInfo hinfo = intersectSphere(ray, spheres[si], 0.0f, TMAX);
-    if (hinfo.hit && (hinfo.t < intersection.t || !hinfo.hit)) {
-      intersection = hinfo;
-      destColor = spheres[si].color;
-      intersectedSphere = si;
-    }
-  }
+      int intersectedSphere = -1;
+      HitInfo intersection;
+      intersection.hit = false;
+      intersection.t = TMAX;
+      vec3 destColor;
 
-  vec3 diffuse = vec3(0.0);
-  vec3 specular = vec3(0.0);
+      for (int si = 0; si < 3; si++) {
+        HitInfo hinfo = intersectSphere(ray, spheres[si], 0.0f, TMAX);
+        if (hinfo.hit && (hinfo.t < intersection.t || !hinfo.hit)) {
+          intersection = hinfo;
+          destColor = spheres[si].color;
+          intersectedSphere = si;
+        }
+      }
 
-  if (intersection.hit) {
-    vec3 normal = intersection.outward_normal;
-    for (int li = 0; li < MAX_LIGHTS; li++) {
-      Light light = lights[li];
-      if (light.enabled == 1) {
-        vec3 lightColor = vec3(light.color[0], light.color[1], light.color[2]);
+      vec3 diffuse = vec3(0.0);
+      vec3 specular = vec3(0.0);
 
-        diffuse += lightColor * max(dot(-normalize(light.target - light.position), normal), 0.0);
+      if (intersection.hit) {
+        vec3 normal = intersection.outward_normal;
+        for (int li = 0; li < MAX_LIGHTS; li++) {
+          Light light = lights[li];
+          if (light.enabled == 1) {
+            vec3 lightColor = vec3(light.color[0], light.color[1], light.color[2]);
 
-        vec3 reflection = reflect(-normalize(light.position - light.target), normal);
-        specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersection.point)), 0.0), 32.0);
+            diffuse += lightColor * max(dot(-normalize(light.target - light.position), normal), 0.0);
+
+            vec3 reflection = reflect(-normalize(light.position - light.target), normal);
+            specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersection.point)), 0.0), 32.0);
+          }
+        }
+
+        destColor = 0.5 * vec3(normal.x + destColor.x + 1, normal.y + destColor.y + 1, normal.z + destColor.z + 1);
+        color += (ambient + diffuse + 2 * specular) * destColor;
+      } else {
+        // sky gradient
+        float norm_y = (gl_FragCoord.y / resolution.y);
+        color += (1 - norm_y) * vec3(1) + norm_y * vec3(0.5, 0.7, 1);
       }
     }
-
-    destColor = 0.5 * vec3(normal.x + destColor.x + 1, normal.y + destColor.y + 1, normal.z + destColor.z + 1);
-    gl_FragColor = vec4((ambient + diffuse + 2 * specular) * destColor, 1.0);
-  } else {
-    float norm_y = (gl_FragCoord.y / resolution.y);
-    gl_FragColor = vec4((1 - norm_y) * vec3(1), 1) + vec4(norm_y * vec3(0.5, 0.7, 1), 1);
   }
+
+  gl_FragColor = vec4(color / (AA_ROWS * AA_COLS), 1.0f);
 }
