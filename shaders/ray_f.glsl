@@ -1,5 +1,6 @@
 #version 330
 
+#define TMAX 3000.0f
 #define PI 3.14159265359
 
 uniform vec2 resolution;
@@ -31,15 +32,19 @@ uniform Light lights[MAX_LIGHTS];
 
 uniform Sphere spheres[3];
 
-struct hit_info {
+struct HitInfo {
   bool hit;
   float t;
+  vec3 point;
+  vec3 outward_normal;
 };
 
-hit_info intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
-  hit_info hinfo;
+HitInfo intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
+  HitInfo hinfo;
   hinfo.hit = false;
   hinfo.t = 0.0f;
+  hinfo.point = vec3(0);
+  hinfo.outward_normal = vec3(0);
 
   float a = dot(R.direction, R.direction);
   float b = -2 * dot(R.direction, S.position - R.origin);
@@ -58,6 +63,10 @@ hit_info intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
 
     hinfo.hit = true;
     hinfo.t = t;
+    hinfo.point = R.origin + t * R.direction;
+    vec3 normal = (hinfo.point - S.position) / S.radius;
+    // make sure normal has direction opposite to ray
+    hinfo.outward_normal = (dot(normal, R.direction) < 0.0f) ? normal : -normal;
   }
 
   return hinfo;
@@ -74,16 +83,16 @@ void main(void) {
   ray.direction = normalize(p_rotated - viewPos);
 
   vec3 destColor = vec3(0.0);
-  float closestIntersection = -1;
-  vec3 intersectionPoint = vec3(0.0);
   int intersectedSphere = -1;
+  HitInfo intersection;
+  intersection.hit = false;
+  intersection.t = TMAX;
 
   for (int si = 0; si < 3; si++) {
-    hit_info hinfo = intersectSphere(ray, spheres[si], 0.0f, 3000.0f);
-    if (hinfo.hit && (hinfo.t < closestIntersection || closestIntersection == -1)) {
-      closestIntersection = hinfo.t;
+    HitInfo hinfo = intersectSphere(ray, spheres[si], 0.0f, TMAX);
+    if (hinfo.hit && (hinfo.t < intersection.t || !hinfo.hit)) {
+      intersection = hinfo;
       destColor = spheres[si].color;
-      intersectionPoint = ray.origin + ray.direction * hinfo.t;
       intersectedSphere = si;
     }
   }
@@ -91,8 +100,8 @@ void main(void) {
   vec3 diffuse = vec3(0.0);
   vec3 specular = vec3(0.0);
 
-  if (closestIntersection != -1) {
-    vec3 normal = (intersectionPoint - spheres[intersectedSphere].position) / spheres[intersectedSphere].radius;
+  if (intersection.hit) {
+    vec3 normal = intersection.outward_normal;
     for (int li = 0; li < MAX_LIGHTS; li++) {
       Light light = lights[li];
       if (light.enabled == 1) {
@@ -101,7 +110,7 @@ void main(void) {
         diffuse += lightColor * max(dot(-normalize(light.target - light.position), normal), 0.0);
 
         vec3 reflection = reflect(-normalize(light.position - light.target), normal);
-        specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersectionPoint)), 0.0), 32.0);
+        specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersection.point)), 0.0), 32.0);
       }
     }
 
