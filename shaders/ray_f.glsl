@@ -43,6 +43,7 @@ struct HitInfo {
   float t;
   vec3 point;
   vec3 outward_normal;
+  vec3 color;
 };
 
 HitInfo intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
@@ -78,7 +79,7 @@ HitInfo intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
   return hinfo;
 }
 
-vec3 computeColor(HitInfo intersection, Ray ray, vec3 originalColor) {
+vec3 computeColor(HitInfo intersection, Ray ray) {
   vec3 diffuse = vec3(0.0);
   vec3 specular = vec3(0.0);
 
@@ -96,13 +97,28 @@ vec3 computeColor(HitInfo intersection, Ray ray, vec3 originalColor) {
       }
     }
 
-    originalColor = 0.5 * vec3(normal.x + originalColor.x + 1, normal.y + originalColor.y + 1, normal.z + originalColor.z + 1);
-    return (ambient + diffuse + 2 * specular) * originalColor;
+    intersection.color = 0.5 * vec3(normal.x + intersection.color.x + 1, normal.y + intersection.color.y + 1, normal.z + intersection.color.z + 1);
+    return (ambient + diffuse + 2 * specular) * intersection.color;
   } else {
     // sky gradient
     float norm_y = (gl_FragCoord.y / resolution.y);
     return (1 - norm_y) * vec3(1) + norm_y * vec3(0.5, 0.7, 1);
   }
+}
+HitInfo getIntersectionInfo(Ray ray) {
+  HitInfo intersection;
+  intersection.hit = false;
+  intersection.t = TMAX;
+
+  for (int si = 0; si < 3; si++) {
+    HitInfo hinfo = intersectSphere(ray, spheres[si], 0.0f, TMAX);
+    if (hinfo.hit && (hinfo.t < intersection.t || !hinfo.hit)) {
+      hinfo.color = spheres[si].color;
+      intersection = hinfo;
+    }
+  }
+
+  return intersection;
 }
 
 void main(void) {
@@ -119,20 +135,9 @@ void main(void) {
       vec3 p_rotated = vec3(-sin(theta) * (p.x + x), (p.y + y), cos(theta) * (p.x + x));
       ray.direction = normalize(p_rotated - viewPos);
 
-      HitInfo intersection;
-      intersection.hit = false;
-      intersection.t = TMAX;
-      vec3 destColor;
+      HitInfo intersection = getIntersectionInfo(ray);
 
-      for (int si = 0; si < 3; si++) {
-        HitInfo hinfo = intersectSphere(ray, spheres[si], 0.0f, TMAX);
-        if (hinfo.hit && (hinfo.t < intersection.t || !hinfo.hit)) {
-          intersection = hinfo;
-          destColor = spheres[si].color;
-        }
-      }
-
-      color += computeColor(intersection, ray, destColor);
+      color += computeColor(intersection, ray);
     }
   }
 
