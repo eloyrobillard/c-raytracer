@@ -2,8 +2,8 @@
 
 // number of samples used for antialiasing
 // prefer to use odd numbers
-#define AA_ROWS 3
-#define AA_COLS 3
+#define AA_ROWS 7
+#define AA_COLS 7
 
 #define TMAX 3000.0f
 
@@ -78,6 +78,33 @@ HitInfo intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
   return hinfo;
 }
 
+vec3 computeColor(HitInfo intersection, Ray ray, vec3 originalColor) {
+  vec3 diffuse = vec3(0.0);
+  vec3 specular = vec3(0.0);
+
+  if (intersection.hit) {
+    vec3 normal = intersection.outward_normal;
+    for (int li = 0; li < MAX_LIGHTS; li++) {
+      Light light = lights[li];
+      if (light.enabled == 1) {
+        vec3 lightColor = vec3(light.color[0], light.color[1], light.color[2]);
+
+        diffuse += lightColor * max(dot(-normalize(light.target - light.position), normal), 0.0);
+
+        vec3 reflection = reflect(-normalize(light.position - light.target), normal);
+        specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersection.point)), 0.0), 32.0);
+      }
+    }
+
+    originalColor = 0.5 * vec3(normal.x + originalColor.x + 1, normal.y + originalColor.y + 1, normal.z + originalColor.z + 1);
+    return (ambient + diffuse + 2 * specular) * originalColor;
+  } else {
+    // sky gradient
+    float norm_y = (gl_FragCoord.y / resolution.y);
+    return (1 - norm_y) * vec3(1) + norm_y * vec3(0.5, 0.7, 1);
+  }
+}
+
 void main(void) {
   vec3 color = vec3(0.0);
 
@@ -107,30 +134,7 @@ void main(void) {
         }
       }
 
-      vec3 diffuse = vec3(0.0);
-      vec3 specular = vec3(0.0);
-
-      if (intersection.hit) {
-        vec3 normal = intersection.outward_normal;
-        for (int li = 0; li < MAX_LIGHTS; li++) {
-          Light light = lights[li];
-          if (light.enabled == 1) {
-            vec3 lightColor = vec3(light.color[0], light.color[1], light.color[2]);
-
-            diffuse += lightColor * max(dot(-normalize(light.target - light.position), normal), 0.0);
-
-            vec3 reflection = reflect(-normalize(light.position - light.target), normal);
-            specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersection.point)), 0.0), 32.0);
-          }
-        }
-
-        destColor = 0.5 * vec3(normal.x + destColor.x + 1, normal.y + destColor.y + 1, normal.z + destColor.z + 1);
-        color += (ambient + diffuse + 2 * specular) * destColor;
-      } else {
-        // sky gradient
-        float norm_y = (gl_FragCoord.y / resolution.y);
-        color += (1 - norm_y) * vec3(1) + norm_y * vec3(0.5, 0.7, 1);
-      }
+      color += computeColor(intersection, ray, destColor);
     }
   }
 
