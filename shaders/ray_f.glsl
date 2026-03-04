@@ -131,16 +131,26 @@ void main(void) {
 
   Ray ray;
   ray.origin = viewPos;
-  for (int y = -(AA_ROWS / 2); y <= AA_ROWS / 2; y++) {
-    for (int x = -(AA_COLS / 2); x <= AA_COLS / 2; x++) {
-      vec3 p_rotated = vec3(-sin(theta) * (p.x + x), (p.y + y), cos(theta) * (p.x + x));
-      ray.direction = normalize(p_rotated - viewPos);
+  vec3 p_rotated = vec3(-sin(theta) * p.x, p.y, cos(theta) * p.x);
+  ray.direction = normalize(p_rotated - viewPos);
 
-      HitInfo intersection = getIntersectionInfo(ray);
+  HitInfo intersection = getIntersectionInfo(ray);
+  color += computeColor(intersection, ray);
 
-      color += computeColor(intersection, ray);
+  if (intersection.hit) {
+    for (int y = -(AA_ROWS / 2); y <= AA_ROWS / 2; y++) {
+      for (int x = -(AA_COLS / 2); x <= AA_COLS / 2; x++) {
+        vec3 p_rotated = vec3(-sin(theta) * (p.x + x), (p.y + y), cos(theta) * (p.x + x));
+        ray.direction = normalize(p_rotated - viewPos);
+
+        intersection = getIntersectionInfo(ray);
+
+        color += computeColor(intersection, ray);
+      }
     }
+    gl_FragColor = vec4(color / (AA_ROWS * AA_COLS), 1.0f);
   }
-
-  gl_FragColor = vec4(color / (AA_ROWS * AA_COLS), 1.0f);
+  else {
+    gl_FragColor = vec4(color, 1.0f);
+  }
 }
