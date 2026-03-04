@@ -97,7 +97,7 @@ vec3 computeColor(HitInfo intersection, Ray ray) {
       }
     }
 
-    intersection.color = 0.5 * vec3(normal.x + intersection.color.x + 1, normal.y + intersection.color.y + 1, normal.z + intersection.color.z + 1);
+    intersection.color = 0.5 * (normal + intersection.color + vec3(1));
     return (ambient + diffuse + 2 * specular) * intersection.color;
   } else {
     // sky gradient
@@ -105,6 +105,7 @@ vec3 computeColor(HitInfo intersection, Ray ray) {
     return (1 - norm_y) * vec3(1) + norm_y * vec3(0.5, 0.7, 1);
   }
 }
+
 HitInfo getIntersectionInfo(Ray ray) {
   HitInfo intersection;
   intersection.hit = false;
