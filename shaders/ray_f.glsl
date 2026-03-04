@@ -2,8 +2,8 @@
 
 // number of samples used for antialiasing
 // prefer to use odd numbers
-#define AA_ROWS 7
-#define AA_COLS 7
+#define AA_ROWS 7.0f
+#define AA_COLS 7.0f
 
 #define TMAX 3000.0f
 
@@ -157,8 +157,10 @@ void main(void) {
   color += computeColor(intersection, ray);
 
   if (intersection.hit) {
-    for (int y = -(AA_ROWS / 2); y <= AA_ROWS / 2; y++) {
-      for (int x = -(AA_COLS / 2); x <= AA_COLS / 2; x++) {
+    float dy = 1.0f / AA_ROWS;
+    float dx = 1.0f / AA_COLS;
+    for (float y = 0.0f; y < 1.0f; y += dy) {
+      for (float x = 0.0f; x < 1.0f; x += dx) {
         vec3 p_rotated = vec3(-sin(theta) * (p.x + x), (p.y + y), cos(theta) * (p.x + x));
         ray.direction = normalize(p_rotated - viewPos);
 
@@ -167,7 +169,8 @@ void main(void) {
         color += computeColor(intersection, ray);
       }
     }
-    gl_FragColor = vec4(color / (AA_ROWS * AA_COLS), 1.0f);
+
+    gl_FragColor = vec4(color / (AA_ROWS * AA_COLS + 1.0f), 1.0f);
   }
   else {
     gl_FragColor = vec4(color, 1.0f);
