@@ -125,6 +125,7 @@ HitInfo getIntersectionInfo(Ray ray) {
 void main(void) {
   // shift origin to center of screen (coordinates still grow downward)
   vec2 p = gl_FragCoord.xy * 2 - resolution;
+  float theta = viewPos.x == 0.0f ? -sign(viewPos.z) * PI / 2.0f : atan(-viewPos.z, -viewPos.x);
 
   vec3 color = vec3(0.0);
 
@@ -132,7 +133,6 @@ void main(void) {
   ray.origin = viewPos;
   for (int y = -(AA_ROWS / 2); y <= AA_ROWS / 2; y++) {
     for (int x = -(AA_COLS / 2); x <= AA_COLS / 2; x++) {
-      float theta = viewPos.x == 0.0f ? -sign(viewPos.z) * PI / 2.0f : atan(-viewPos.z, -viewPos.x);
       vec3 p_rotated = vec3(-sin(theta) * (p.x + x), (p.y + y), cos(theta) * (p.x + x));
       ray.direction = normalize(p_rotated - viewPos);
 
