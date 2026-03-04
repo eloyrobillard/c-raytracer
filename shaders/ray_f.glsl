@@ -2,8 +2,8 @@
 
 // number of samples used for antialiasing
 // prefer to use odd numbers
-#define AA_ROWS 7.0f
-#define AA_COLS 7.0f
+#define AA_ROWS 10.0f
+#define AA_COLS 10.0f
 
 #define TMAX 3000.0f
 
@@ -80,31 +80,31 @@ HitInfo intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
   return hinfo;
 }
 
+vec3 computeBgColor(float y) {
+  // sky gradient
+  float norm_y = (y / resolution.y);
+  return (1 - norm_y) * vec3(1) + norm_y * vec3(0.5, 0.7, 1);
+}
+
 vec3 computeColor(HitInfo intersection, Ray ray) {
   vec3 diffuse = vec3(0.0);
   vec3 specular = vec3(0.0);
 
-  if (intersection.hit) {
-    vec3 normal = intersection.outward_normal;
-    for (int li = 0; li < MAX_LIGHTS; li++) {
-      Light light = lights[li];
-      if (light.enabled == 1) {
-        vec3 lightColor = vec3(light.color[0], light.color[1], light.color[2]);
+  vec3 normal = intersection.outward_normal;
+  for (int li = 0; li < MAX_LIGHTS; li++) {
+    Light light = lights[li];
+    if (light.enabled == 1) {
+      vec3 lightColor = vec3(light.color[0], light.color[1], light.color[2]);
 
-        diffuse += lightColor * max(dot(-normalize(light.target - light.position), normal), 0.0);
+      diffuse += lightColor * max(dot(-normalize(light.target - light.position), normal), 0.0);
 
-        vec3 reflection = reflect(-normalize(light.position - light.target), normal);
-        specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersection.point)), 0.0), 32.0);
-      }
+      vec3 reflection = reflect(-normalize(light.position - light.target), normal);
+      specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersection.point)), 0.0), 32.0);
     }
-
-    intersection.color = 0.5 * (normal + intersection.color + vec3(1));
-    return (ambient + diffuse + 2 * specular) * intersection.color;
-  } else {
-    // sky gradient
-    float norm_y = (gl_FragCoord.y / resolution.y);
-    return (1 - norm_y) * vec3(1) + norm_y * vec3(0.5, 0.7, 1);
   }
+
+  intersection.color = 0.5 * (normal + intersection.color + vec3(1));
+  return (ambient + diffuse + 2 * specular) * intersection.color;
 }
 
 HitInfo getIntersectionInfo(Ray ray) {
@@ -141,12 +141,33 @@ vec3 random_unit_vector(vec2 st) {
   return vec3(r * cos(a), r * sin(a), z);
 }
 
+vec3 applyAntialiasing(Ray ray, vec2 p, float theta) {
+  vec3 color = vec3(0.0f);
+
+  float dy = 1.0f / AA_ROWS;
+  float dx = 1.0f / AA_COLS;
+  HitInfo rec;
+  for (float y = -0.9999f; y < 1.0f; y += 2.0f * dy) {
+    for (float x = -0.9999f; x < 1.0f; x += 2.0f * dx) {
+      vec3 p_rotated = vec3(-sin(theta) * (p.x + x), (p.y + y), cos(theta) * (p.x + x));
+      ray.direction = normalize(p_rotated - viewPos);
+
+      rec = getIntersectionInfo(ray);
+
+      if (rec.hit)
+        color += computeColor(rec, ray);
+      else
+        color += computeBgColor(p_rotated.y);
+    }
+  }
+
+  return color / (AA_ROWS * AA_COLS);
+}
+
 void main(void) {
   // shift origin to center of screen (coordinates still grow downward)
   vec2 p = gl_FragCoord.xy * 2 - resolution;
   float theta = viewPos.x == 0.0f ? -sign(viewPos.z) * PI / 2.0f : atan(-viewPos.z, -viewPos.x);
-
-  vec3 color = vec3(0.0);
 
   Ray ray;
   ray.origin = viewPos;
@@ -154,25 +175,7 @@ void main(void) {
   ray.direction = normalize(p_rotated - viewPos);
 
   HitInfo intersection = getIntersectionInfo(ray);
-  color += computeColor(intersection, ray);
 
-  if (intersection.hit) {
-    float dy = 1.0f / AA_ROWS;
-    float dx = 1.0f / AA_COLS;
-    for (float y = 0.0f; y < 1.0f; y += dy) {
-      for (float x = 0.0f; x < 1.0f; x += dx) {
-        vec3 p_rotated = vec3(-sin(theta) * (p.x + x), (p.y + y), cos(theta) * (p.x + x));
-        ray.direction = normalize(p_rotated - viewPos);
-
-        intersection = getIntersectionInfo(ray);
-
-        color += computeColor(intersection, ray);
-      }
-    }
-
-    gl_FragColor = vec4(color / (AA_ROWS * AA_COLS + 1.0f), 1.0f);
-  }
-  else {
-    gl_FragColor = vec4(color, 1.0f);
-  }
+  vec3 color = applyAntialiasing(ray, p, theta);
+  gl_FragColor = vec4(color, 1.0f);
 }
