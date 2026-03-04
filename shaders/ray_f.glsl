@@ -86,7 +86,7 @@ vec3 computeBgColor(float y) {
   return (1 - norm_y) * vec3(1) + norm_y * vec3(0.5, 0.7, 1);
 }
 
-vec3 computeColor(HitInfo intersection, Ray ray) {
+vec3 computeLighting(HitInfo intersection, Ray ray, vec3 color) {
   vec3 diffuse = vec3(0.0);
   vec3 specular = vec3(0.0);
 
@@ -103,8 +103,11 @@ vec3 computeColor(HitInfo intersection, Ray ray) {
     }
   }
 
-  intersection.color = 0.5 * (normal + intersection.color + vec3(1));
-  return (ambient + diffuse + 2 * specular) * intersection.color;
+  return (ambient + diffuse + 2 * specular) * color;
+}
+
+vec3 computeColor(HitInfo intersection) {
+  return 0.5 * (intersection.outward_normal + intersection.color + vec3(1));
 }
 
 HitInfo getIntersectionInfo(Ray ray) {
@@ -155,7 +158,7 @@ vec3 applyAntialiasing(Ray ray, vec2 p, float theta) {
       rec = getIntersectionInfo(ray);
 
       if (rec.hit)
-        color += computeColor(rec, ray);
+        color += computeColor(rec);
       else
         color += computeBgColor(p_rotated.y);
     }
@@ -177,5 +180,9 @@ void main(void) {
   HitInfo intersection = getIntersectionInfo(ray);
 
   vec3 color = applyAntialiasing(ray, p, theta);
+  if (intersection.hit) {
+    color = computeLighting(intersection, ray, color);
+  }
+
   gl_FragColor = vec4(color, 1.0f);
 }
