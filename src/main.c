@@ -2,6 +2,7 @@
 #include <math.h>
 #include <raylib.h>
 #include <raymath.h>
+#include <time.h>
 
 #define RLIGHTS_IMPLEMENTATION
 #include <rlights.h>
@@ -70,6 +71,7 @@ int main(int argc, char **argv) {
   camera.fovy = 45.0f;                                        // Camera field-of-view Y
   camera.projection = CAMERA_PERSPECTIVE;
 
+  time_t current_time;
   const int SPEED = 4;
   while (!WindowShouldClose()) {
     float direction_fb = 0;
@@ -89,6 +91,10 @@ int main(int argc, char **argv) {
 
     Vector2 resolutionVec = {(float)screenWidth, (float)screenHeight};
     SetShaderValue(shader, GetShaderLocation(shader, "resolution"), &resolutionVec, SHADER_UNIFORM_VEC2);
+
+    time(&current_time);
+
+    SetShaderValue(shader, GetShaderLocation(shader, "currentTime"), &current_time, SHADER_UNIFORM_FLOAT);
 
     BeginDrawing();
 

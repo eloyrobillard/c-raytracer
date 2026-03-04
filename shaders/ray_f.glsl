@@ -12,6 +12,7 @@
 uniform vec2 resolution;
 uniform vec3 ambient;
 uniform vec3 viewPos;
+uniform float currentTime;
 
 struct Ray {
   vec3 origin;
@@ -120,6 +121,24 @@ HitInfo getIntersectionInfo(Ray ray) {
   }
 
   return intersection;
+}
+
+float random(vec2 st) {
+  return fract(sin(dot(st.xy,
+        vec2(12.9898, 78.233))) *
+      43758.5453123 * currentTime);
+}
+
+float random_clamped(vec2 st, float min, float max) {
+  float rand = random(st);
+  return mod(rand, (max - min)) + min;
+}
+
+vec3 random_unit_vector(vec2 st) {
+  float a = random_clamped(st, 0, 2 * PI);
+  float z = random_clamped(st, -1, 1);
+  float r = sqrt(1 - z * z);
+  return vec3(r * cos(a), r * sin(a), z);
 }
 
 void main(void) {
