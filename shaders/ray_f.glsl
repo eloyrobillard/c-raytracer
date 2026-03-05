@@ -25,6 +25,8 @@ struct Sphere {
   vec3 color;
 };
 
+#define NUM_SPHERES 3
+
 struct Light {
   int enabled;
   int type;
@@ -45,6 +47,7 @@ struct HitInfo {
   vec3 point;
   vec3 outward_normal;
   vec3 color;
+  int sphereIdx;
 };
 
 HitInfo intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
@@ -93,13 +96,32 @@ vec3 computeLighting(HitInfo intersection, Ray ray, vec3 color) {
   vec3 normal = intersection.outward_normal;
   for (int li = 0; li < MAX_LIGHTS; li++) {
     Light light = lights[li];
+
     if (light.enabled == 1) {
-      vec3 lightColor = vec3(light.color[0], light.color[1], light.color[2]);
+      vec3 lightColor = light.color.xyz;
+      vec3 lightVec = normalize(light.target - light.position);
 
-      diffuse += lightColor * max(dot(-normalize(light.target - light.position), normal), 0.0);
+      Ray lightRay;
+      lightRay.origin = intersection.point;
+      lightRay.direction = lightVec;
 
-      vec3 reflection = reflect(-normalize(light.position - light.target), normal);
-      specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersection.point)), 0.0), 32.0);
+      bool inShadow = false;
+
+      for (int i = 0; i < NUM_SPHERES; i++) {
+        if (i == intersection.sphereIdx) continue;
+        HitInfo hinfo = intersectSphere(lightRay, spheres[i], 0.0f, TMAX);
+
+        if (hinfo.hit) {
+          inShadow = true;
+        }
+      }
+
+      if (!inShadow) {
+        diffuse += lightColor * max(dot(-lightVec, normal), 0.0);
+
+        vec3 reflection = reflect(lightVec, normal);
+        specular += lightColor * pow(max(dot(reflection, normalize(ray.origin - intersection.point)), 0.0), 32.0);
+      }
     }
   }
 
@@ -115,10 +137,11 @@ HitInfo getIntersectionInfo(Ray ray) {
   intersection.hit = false;
   intersection.t = TMAX;
 
-  for (int si = 0; si < 3; si++) {
+  for (int si = 0; si < NUM_SPHERES; si++) {
     HitInfo hinfo = intersectSphere(ray, spheres[si], 0.0f, TMAX);
     if (hinfo.hit && (hinfo.t < intersection.t || !hinfo.hit)) {
       hinfo.color = spheres[si].color;
+      hinfo.sphereIdx = si;
       intersection = hinfo;
     }
   }
