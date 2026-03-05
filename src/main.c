@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
                       },
                       {
                           .type = SPHERE,
-                          .pos_center = {.x = -300, .y = -300, .z = -250},
+                          .pos_center = {.x = -500, .y = -500, .z = -250},
                           .color = BLUE,
                           .radius = 200,
                       }};

@@ -58,15 +58,15 @@ HitInfo intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
   hinfo.outward_normal = vec3(0);
 
   float a = dot(R.direction, R.direction);
-  float b = -2 * dot(R.direction, S.position - R.origin);
+  float halfB = -dot(R.direction, S.position - R.origin);
   float c = dot(R.origin - S.position, R.origin - S.position) - (S.radius * S.radius);
-  float d = b * b - 4 * a * c;
+  float d = halfB * halfB - a * c;
 
   if (d > 0.0) {
     float sqrtd = sqrt(d);
-    float t = (-b - sqrtd) / (2 * a);
+    float t = (-halfB - sqrtd) / a;
     if (t <= tmin || tmax <= t) {
-      t = (-b + sqrtd) / (2 * a);
+      t = (-halfB + sqrtd) / a;
       if (t <= tmin || tmax <= t) {
         return hinfo;
       }
@@ -103,12 +103,13 @@ vec3 computeLighting(HitInfo intersection, Ray ray, vec3 color) {
 
       Ray lightRay;
       lightRay.origin = intersection.point;
-      lightRay.direction = lightVec;
+      lightRay.direction = -lightVec;
 
       bool inShadow = false;
 
       for (int i = 0; i < NUM_SPHERES; i++) {
         if (i == intersection.sphereIdx) continue;
+
         HitInfo hinfo = intersectSphere(lightRay, spheres[i], 0.0f, TMAX);
 
         if (hinfo.hit) {
