@@ -12,7 +12,6 @@
 uniform vec2 resolution;
 uniform vec3 ambient;
 uniform vec3 viewPos;
-uniform float currentTime;
 
 struct Ray {
   vec3 origin;
@@ -149,9 +148,7 @@ HitInfo getIntersectionInfo(Ray ray) {
 }
 
 float random(vec2 st) {
-  return fract(sin(dot(st.xy,
-        vec2(12.9898, 78.233))) *
-      43758.5453123 * currentTime);
+  return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
 float random_clamped(vec2 st, float min, float max) {
@@ -166,21 +163,20 @@ vec3 random_unit_vector(vec2 st) {
   return vec3(r * cos(a), r * sin(a), z);
 }
 
-vec3 computeLambertianReflectance(HitInfo hinfo) {
+vec3 computeLambertianReflectance(HitInfo hinfo, vec3 init_vector) {
   int depth = 50;
-
-  Ray ray;
-  ray.origin = hinfo.point;
-
-  HitInfo rec;
-  rec.outward_normal = hinfo.outward_normal;
 
   // NOTE: レイのヒットがなくても、ループは少なくとも一回実行されるので
   // factorを２にして、最初のループで１になる
   float factor = 2.0f;
 
-  vec3 unit_vector = random_unit_vector(gl_FragCoord.xy);
-  ray.direction = hinfo.outward_normal + unit_vector;
+  vec3 unit_vector = random_unit_vector(init_vector.xy);
+
+  HitInfo rec;
+  rec.point = hinfo.point;
+  rec.outward_normal = hinfo.outward_normal;
+
+  Ray ray;
 
   do {
     factor *= 0.5f;
@@ -188,6 +184,9 @@ vec3 computeLambertianReflectance(HitInfo hinfo) {
     if (dot(unit_vector, rec.outward_normal) <= 0.0) {
       unit_vector = -unit_vector;
     }
+
+    ray.origin = rec.point;
+    ray.direction = rec.outward_normal + unit_vector;
 
     rec = getIntersectionInfo(ray);
 
@@ -197,8 +196,6 @@ vec3 computeLambertianReflectance(HitInfo hinfo) {
     }
 
     unit_vector = random_unit_vector(unit_vector.xy);
-    ray.origin = rec.point;
-    ray.direction = rec.outward_normal + unit_vector;
   } while (rec.hit);
 
   return computeBgColor(unit_vector.y) * factor;
@@ -244,7 +241,7 @@ void main(void) {
 
   vec3 color = applyAntialiasing(ray, p, theta);
   if (intersection.hit) {
-    color = computeLambertianReflectance(intersection);
+    color = computeLambertianReflectance(intersection, p_rotated);
     // color = computeLighting(intersection, ray, color);
   }
 
