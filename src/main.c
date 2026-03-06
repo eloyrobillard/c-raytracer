@@ -7,6 +7,8 @@
 #define RLIGHTS_IMPLEMENTATION
 #include <rlights.h>
 
+#define NUM_SPHERES 4
+
 int main(int argc, char **argv) {
   const int screenWidth = 1920;
   const int screenHeight = 1080;
@@ -16,28 +18,34 @@ int main(int argc, char **argv) {
   InitWindow(screenWidth, screenHeight, "Raytracer");
   SetTargetFPS(60);
 
-  Object objects[] = {{
-                          .type = SPHERE,
-                          .pos_center = {.x = 0, .y = 0, .z = 0},
-                          .color = RED,
-                          .radius = 500,
-                      },
-                      {
-                          .type = SPHERE,
-                          .pos_center = {.x = 300, .y = 300, .z = 250},
-                          .color = BROWN,
-                          .radius = 200,
-                      },
-                      {
-                          .type = SPHERE,
-                          .pos_center = {.x = -500, .y = -500, .z = -250},
-                          .color = BLUE,
-                          .radius = 200,
-                      }};
+  Object objects[NUM_SPHERES] = {{
+                                     .type = SPHERE,
+                                     .pos_center = {.x = 0, .y = 0, .z = 0},
+                                     .color = RED,
+                                     .radius = 500,
+                                 },
+                                 {
+                                     .type = SPHERE,
+                                     .pos_center = {.x = 300, .y = 300, .z = 250},
+                                     .color = BROWN,
+                                     .radius = 200,
+                                 },
+                                 {
+                                     .type = SPHERE,
+                                     .pos_center = {.x = -500, .y = -500, .z = -250},
+                                     .color = BLUE,
+                                     .radius = 200,
+                                 },
+                                 {
+                                     .type = SPHERE,
+                                     .pos_center = {.x = 0, .y = -400500, .z = 0},
+                                     .color = WHITE,
+                                     .radius = 400000,
+                                 }};
 
   RTLight lights[] = {{.type = DIRECTIONAL, .direction = {.x = 1, .y = -1, .z = 1}, .intensity = 120.0}};
 
-  World world = {.objects = objects, .num_objects = 3, .lights = lights, .num_lights = 1};
+  World world = {.objects = objects, .num_objects = NUM_SPHERES, .lights = lights, .num_lights = 1};
 
   Shader shader = LoadShader(0, "shaders/ray_f.glsl");
   // ray_shader.locs[SHADER_LOC_MATRIX_MVP] = GetShaderLocation(ray_shader, "mvp");
