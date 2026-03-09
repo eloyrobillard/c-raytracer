@@ -6,7 +6,7 @@
 #define RLIGHTS_IMPLEMENTATION
 #include <rlights.h>
 
-#define NUM_SPHERES 4
+#define NUM_SPHERES 2
 
 int main(int argc, char **argv) {
   const int screenWidth = 1920;
@@ -22,18 +22,6 @@ int main(int argc, char **argv) {
                                      .pos_center = {.x = 0, .y = 0, .z = 0},
                                      .color = RED,
                                      .radius = 500,
-                                 },
-                                 {
-                                     .type = SPHERE,
-                                     .pos_center = {.x = 300, .y = 300, .z = 250},
-                                     .color = BROWN,
-                                     .radius = 200,
-                                 },
-                                 {
-                                     .type = SPHERE,
-                                     .pos_center = {.x = -500, .y = -500, .z = -250},
-                                     .color = BLUE,
-                                     .radius = 200,
                                  },
                                  {
                                      .type = SPHERE,
@@ -68,7 +56,7 @@ int main(int argc, char **argv) {
 
   SetShaderValue(shader, GetShaderLocation(shader, "ambient"), (float[3]){0.2f, 0.2f, 0.2f}, SHADER_UNIFORM_VEC3);
 
-  CreateLight(LIGHT_DIRECTIONAL, (Vector3){-1.0f, -1.0f, -1.0f}, (Vector3){0.0f, 0.0f, 0.0f},
+  CreateLight(LIGHT_DIRECTIONAL, (Vector3){-1.0f, 1.0f, -1.0f}, (Vector3){0.0f, 0.0f, 0.0f},
               (Color){255.0f, 255.0f, 255.0f, 255.0f}, shader);
 
   Camera camera = {0};

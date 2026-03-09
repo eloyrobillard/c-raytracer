@@ -24,7 +24,7 @@ struct Sphere {
   vec3 color;
 };
 
-#define NUM_SPHERES 4
+#define NUM_SPHERES 2
 uniform Sphere spheres[NUM_SPHERES];
 
 struct Light {
@@ -147,60 +147,6 @@ HitInfo getIntersectionInfo(Ray ray) {
   return intersection;
 }
 
-float random(vec2 st) {
-  return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
-}
-
-float random_clamped(vec2 st, float min, float max) {
-  float rand = random(st);
-  return mod(rand, (max - min)) + min;
-}
-
-vec3 random_unit_vector(vec2 st) {
-  float a = random_clamped(st, 0, 2 * PI);
-  float z = random_clamped(st, -1, 1);
-  float r = sqrt(1 - z * z);
-  return vec3(r * cos(a), r * sin(a), z);
-}
-
-vec3 computeLambertianReflectance(HitInfo hinfo, vec3 init_vector) {
-  int depth = 50;
-
-  // NOTE: レイのヒットがなくても、ループは少なくとも一回実行されるので
-  // factorを２にして、最初のループで１になる
-  float factor = 2.0f;
-
-  vec3 unit_vector = random_unit_vector(init_vector.xy);
-
-  HitInfo rec;
-  rec.point = hinfo.point;
-  rec.outward_normal = hinfo.outward_normal;
-
-  Ray ray;
-
-  do {
-    factor *= 0.5f;
-
-    if (dot(unit_vector, rec.outward_normal) <= 0.0) {
-      unit_vector = -unit_vector;
-    }
-
-    ray.origin = rec.point;
-    ray.direction = rec.outward_normal + unit_vector;
-
-    rec = getIntersectionInfo(ray);
-
-    // NOTE: "永遠"にレイがヒットしそうになったら、完全に色褪せたとみなす
-    if (--depth <= 0) {
-      return vec3(0.0f);
-    }
-
-    unit_vector = random_unit_vector(unit_vector.xy);
-  } while (rec.hit);
-
-  return computeBgColor(unit_vector.y) * factor;
-}
-
 vec3 applyAntialiasing(Ray
   ray, vec2
   p, float
@@ -241,8 +187,7 @@ void main(void) {
 
   vec3 color = applyAntialiasing(ray, p, theta);
   if (intersection.hit) {
-    color = computeLambertianReflectance(intersection, p_rotated);
-    // color = computeLighting(intersection, ray, color);
+    color = computeLighting(intersection, ray, color);
   }
 
   gl_FragColor = vec4(color, 1.0f);
