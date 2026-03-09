@@ -18,13 +18,16 @@ struct Ray {
   vec3 direction;
 };
 
+#define MATERIAL_DIFFUSE 0
+#define MATERIAL_METAL 1
 struct Sphere {
   vec3 position;
   float radius;
   vec3 color;
+  int material;
 };
 
-#define NUM_SPHERES 2
+#define NUM_SPHERES 4
 uniform Sphere spheres[NUM_SPHERES];
 
 struct Light {
@@ -80,6 +83,23 @@ HitInfo intersectSphere(Ray R, Sphere S, float tmin, float tmax) {
   return hinfo;
 }
 
+HitInfo getIntersectionInfo(Ray ray) {
+  HitInfo intersection;
+  intersection.hit = false;
+  intersection.t = TMAX;
+
+  for (int si = 0; si < NUM_SPHERES; si++) {
+    HitInfo hinfo = intersectSphere(ray, spheres[si], 0.0f, TMAX);
+    if (hinfo.hit && (hinfo.t < intersection.t || !hinfo.hit)) {
+      hinfo.color = spheres[si].color;
+      hinfo.sphereIdx = si;
+      intersection = hinfo;
+    }
+  }
+
+  return intersection;
+}
+
 vec3 computeBgColor(float y) {
   // sky gradient
   float norm_y = (y / resolution.y);
@@ -126,31 +146,60 @@ vec3 computeLighting(HitInfo intersection, Ray ray, vec3 color) {
   return (ambient + diffuse + 2 * specular) * color;
 }
 
-vec3 computeColor(HitInfo intersection) {
-  return 0.5 * (intersection.outward_normal + intersection.color + vec3(1));
-}
-
-HitInfo getIntersectionInfo(Ray ray) {
-  HitInfo intersection;
-  intersection.hit = false;
-  intersection.t = TMAX;
-
-  for (int si = 0; si < NUM_SPHERES; si++) {
-    HitInfo hinfo = intersectSphere(ray, spheres[si], 0.0f, TMAX);
-    if (hinfo.hit && (hinfo.t < intersection.t || !hinfo.hit)) {
-      hinfo.color = spheres[si].color;
-      hinfo.sphereIdx = si;
-      intersection = hinfo;
-    }
+vec3 computeColor(HitInfo hinfo, Ray inbound_ray) {
+  if (spheres[hinfo.sphereIdx].material == MATERIAL_DIFFUSE) {
+    return 0.5 * (hinfo.outward_normal + hinfo.color + vec3(1));
   }
 
-  return intersection;
+  Ray ray;
+  ray.origin = hinfo.point;
+
+  vec3 reflected = reflect(normalize(inbound_ray.direction), hinfo.outward_normal);
+  ray.direction = reflected;
+
+  HitInfo rec = getIntersectionInfo(ray);
+  return rec.hit ? rec.color : computeBgColor(reflected.y);
 }
 
-vec3 applyAntialiasing(Ray
-  ray, vec2
-  p, float
-  theta) {
+// vec3 computeLambertianReflectance(HitInfo hinfo, vec3 init_vector) {
+//   int depth = 50;
+//
+//   // NOTE: レイのヒットがなくても、ループは少なくとも一回実行されるので
+//   // factorを２にして、最初のループで１になる
+//   float factor = 2.0f;
+//
+//   vec3 unit_vector = random_unit_vector(init_vector.xy);
+//
+//   HitInfo rec;
+//   rec.point = hinfo.point;
+//   rec.outward_normal = hinfo.outward_normal;
+//
+//   Ray ray;
+//
+//   do {
+//     factor *= 0.5f;
+//
+//     if (dot(unit_vector, rec.outward_normal) <= 0.0) {
+//       unit_vector = -unit_vector;
+//     }
+//
+//     ray.origin = rec.point;
+//     ray.direction = rec.outward_normal + unit_vector;
+//
+//     rec = getIntersectionInfo(ray);
+//
+//     // NOTE: "永遠"にレイがヒットしそうになったら、完全に色褪せたとみなす
+//     if (--depth <= 0) {
+//       return vec3(0.0f);
+//     }
+//
+//     unit_vector = random_unit_vector(unit_vector.xy);
+//   } while (rec.hit);
+//
+//   return computeBgColor(unit_vector.y) * factor;
+// }
+
+vec3 applyAntialiasing(Ray ray, vec2 p, float theta) {
   vec3 color = vec3(0.0f);
 
   float dy = 1.0f / AA_ROWS;
@@ -164,7 +213,7 @@ vec3 applyAntialiasing(Ray
       rec = getIntersectionInfo(ray);
 
       if (rec.hit)
-        color += computeColor(rec);
+        color += computeColor(rec, ray);
       else
         color += computeBgColor(p_rotated.y);
     }

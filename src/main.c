@@ -6,7 +6,7 @@
 #define RLIGHTS_IMPLEMENTATION
 #include <rlights.h>
 
-#define NUM_SPHERES 2
+#define NUM_SPHERES 4
 
 int main(int argc, char **argv) {
   const int screenWidth = 1920;
@@ -21,12 +21,28 @@ int main(int argc, char **argv) {
                                      .type = SPHERE,
                                      .pos_center = {.x = 0, .y = 0, .z = 0},
                                      .color = RED,
-                                     .radius = 500,
+                                     .material = DIFFUSE,
+                                     .radius = 400,
                                  },
                                  {
                                      .type = SPHERE,
-                                     .pos_center = {.x = 0, .y = -400500, .z = 0},
+                                     .pos_center = {.x = 1000, .y = 0, .z = 0},
+                                     .color = YELLOW,
+                                     .material = METAL,
+                                     .radius = 400,
+                                 },
+                                 {
+                                     .type = SPHERE,
+                                     .pos_center = {.x = -1000, .y = 0, .z = 0},
+                                     .color = BLUE,
+                                     .material = METAL,
+                                     .radius = 400,
+                                 },
+                                 {
+                                     .type = SPHERE,
+                                     .pos_center = {.x = 0, .y = -400400, .z = 0},
                                      .color = GREEN,
+                                     .material = DIFFUSE,
                                      .radius = 400000,
                                  }};
 
@@ -44,6 +60,7 @@ int main(int argc, char **argv) {
     int positionLoc = GetShaderLocation(shader, TextFormat("spheres[%i].position", si));
     int radiusLoc = GetShaderLocation(shader, TextFormat("spheres[%i].radius", si));
     int colorLoc = GetShaderLocation(shader, TextFormat("spheres[%i].color", si));
+    int materialLoc = GetShaderLocation(shader, TextFormat("spheres[%i].material", si));
 
     float spherePos[3] = {(float)sphere.pos_center.x, (float)sphere.pos_center.y, (float)sphere.pos_center.z};
     float sphereColor[3] = {(float)sphere.color.r / 255.0f, (float)sphere.color.g / 255.0f,
@@ -52,6 +69,7 @@ int main(int argc, char **argv) {
     SetShaderValue(shader, positionLoc, spherePos, SHADER_UNIFORM_VEC3);
     SetShaderValue(shader, radiusLoc, &sphere.radius, SHADER_UNIFORM_FLOAT);
     SetShaderValue(shader, colorLoc, sphereColor, SHADER_UNIFORM_VEC3);
+    SetShaderValue(shader, materialLoc, &sphere.material, SHADER_UNIFORM_INT);
   }
 
   SetShaderValue(shader, GetShaderLocation(shader, "ambient"), (float[3]){0.2f, 0.2f, 0.2f}, SHADER_UNIFORM_VEC3);
@@ -74,7 +92,7 @@ int main(int argc, char **argv) {
     if (IsKeyDown(KEY_W))
       direction_fb -= 1;
 
-    UpdateCamera(&camera, CAMERA_ORBITAL);
+    // UpdateCamera(&camera, CAMERA_ORBITAL);
     double theta = atan2(camera.position.z, camera.position.x);
     camera.position.x += cos(theta) * direction_fb * SPEED;
     camera.position.z += sin(theta) * direction_fb * SPEED;

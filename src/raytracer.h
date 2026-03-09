@@ -5,6 +5,7 @@
 #include "vec3.h"
 
 typedef enum { SPHERE, SQUARE, PLANE } ObjectType;
+typedef enum { DIFFUSE = 0, METAL = 1 } ObjectMaterial;
 typedef enum { DIRECTIONAL } RTLightType;
 
 typedef struct {
@@ -14,6 +15,7 @@ typedef struct {
   float radius;    // used by spheres
   Vec3 normal;     // used by planes and squares
   Vec3 normal2;    // used by squares
+  ObjectMaterial material;
   Color color;
 } Object;
 
