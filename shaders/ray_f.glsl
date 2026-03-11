@@ -225,7 +225,7 @@ vec3 applyAntialiasing(Ray ray, vec2 p, float theta) {
 void main(void) {
   // shift origin to center of screen (coordinates still grow downward)
   vec2 p = gl_FragCoord.xy * 2 - resolution;
-  float theta = viewPos.x == 0.0f ? -sign(viewPos.z) * PI / 2.0f : atan(-viewPos.z, -viewPos.x);
+  float theta = viewPos.x == 0.0f ? -sign(viewPos.z) * PI / 2.0f : atan(-viewPos.z, viewPos.x);
 
   Ray ray;
   ray.origin = viewPos;
