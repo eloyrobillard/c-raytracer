@@ -1,12 +1,9 @@
 #ifndef VEC3_H
 #define VEC3_H
+#include <raylib.h>
 #include <stdbool.h>
 
-typedef struct {
-  double x;
-  double y;
-  double z;
-} Vec3;
+typedef Vector3 Vec3;
 
 typedef struct {
   Vec3 _0;

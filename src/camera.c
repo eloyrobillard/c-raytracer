@@ -3,7 +3,7 @@
 #include "vec3.h"
 #include <raylib.h>
 
-void move_camera(RTCamera *camera, float delta) {
+void move_camera(Camera *camera, float delta) {
   float direction_lr = 0;
   if (IsKeyDown(KEY_A))
     direction_lr -= 1;
@@ -18,10 +18,10 @@ void move_camera(RTCamera *camera, float delta) {
 
   Vec3 move = {direction_lr, 0, direction_fb};
 
-  move_forward(&move, &camera->global_position, camera->global_rotation.x, camera->global_rotation.y, delta * 100);
+  move_forward(&move, &camera->position, camera->target.x, camera->target.y, delta * 100);
 }
 
-void tilt_camera(RTCamera *camera, float delta) {
+void tilt_camera(Camera *camera, float delta) {
   int tilt_h = 0;
   if (IsKeyDown(KEY_LEFT))
     tilt_h += 1;
@@ -34,8 +34,8 @@ void tilt_camera(RTCamera *camera, float delta) {
   if (IsKeyDown(KEY_UP))
     tilt_v -= 1;
 
-  Vec3 rotation = {tilt_v * delta, tilt_h * delta, 0};
+  Vec3 target = {tilt_v * delta, tilt_h * delta, 0};
 
-  camera->global_rotation.x = clamp(camera->global_rotation.x + rotation.x, -1.5, 1.5);
-  camera->global_rotation.y += rotation.y;
+  camera->target.x = clamp(camera->target.x + target.x, -1.5, 1.5);
+  camera->target.y += target.y;
 }

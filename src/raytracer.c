@@ -1,5 +1,4 @@
 #include "raytracer.h"
-#include "camera.h"
 #include "utils.h"
 #include "vec3.h"
 #include <assert.h>
@@ -49,12 +48,13 @@ Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, c
   return reflected_vector;
 }
 
-double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sphere_center, const RTLight *light) {
+double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sphere_center, const Light *light) {
   const Vec3 normal = vec3_difference(point, sphere_center);
   const Vec3 unit_normal = normalized(&normal);
 
   // TODO: don't normalize every time
-  const Vec3 unit_light = normalized(&light->direction);
+  Vec3 light_dir = vec3_difference(&light->position, &light->target);
+  const Vec3 unit_light = normalized(&light_dir);
   const Vec3 unit_point = normalized(point);
 
   // Direction vector of line from point on object to tip of reflected light vector
@@ -72,14 +72,13 @@ double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sph
   return result < 0 ? -result : 0;
 }
 
-void trace_rays(int halfScreenWidth, int halfScreenHeight, RTCamera *camera, World *world) {
+void trace_rays(int halfScreenWidth, int halfScreenHeight, Camera *camera, World *world) {
   for (int x = -halfScreenWidth; x < halfScreenWidth; x++) {
     for (int y = -halfScreenHeight; y < halfScreenHeight; y++) {
-      Vec3 direction = {camera->global_position.x + x, camera->global_position.y + y,
-                        camera->global_position.z + halfScreenWidth};
-      Vec3 x_rot_direction = rot_x_around_point(&camera->global_position, &direction, camera->global_rotation.x);
-      Vec3 y_rot_direction = rot_y_around_point(&camera->global_position, &x_rot_direction, camera->global_rotation.y);
-      const Vec3 v = vec3_difference(&y_rot_direction, &camera->global_position);
+      Vec3 direction = {camera->position.x + x, camera->position.y + y, camera->position.z + halfScreenWidth};
+      Vec3 x_rot_direction = rot_x_around_point(&camera->position, &direction, camera->target.x);
+      Vec3 y_rot_direction = rot_y_around_point(&camera->position, &x_rot_direction, camera->target.y);
+      const Vec3 v = vec3_difference(&y_rot_direction, &camera->position);
 
       double min_lambda = INFINITY;
       Color color = WHITE;
@@ -89,8 +88,8 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, RTCamera *camera, Wor
 
         switch (object->type) {
         case SPHERE: {
-          Vec3 cs = vec3_difference(&object->pos_center, &camera->global_position);
-          double lambda = intersects_with_sphere(&camera->global_position, &v, &cs, object->radius);
+          Vec3 cs = vec3_difference(&object->pos_center, &camera->position);
+          double lambda = intersects_with_sphere(&camera->position, &v, &cs, object->radius);
 
           if (lambda < min_lambda) {
             min_lambda = lambda;
@@ -103,15 +102,14 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, RTCamera *camera, Wor
 
       if (min_lambda < INFINITY) {
         for (int i = 0; i < world->num_lights; i++) {
-          RTLight *light = &world->lights[i];
+          Light *light = &world->lights[i];
           Vec3 point = vec3_scalar_mul(&v, min_lambda);
           double light_intensity_ratio =
               compute_light_intensity_ratio_at_point(&point, &camera_to_sphere_center, light);
 
-          double light_intensity_scaled = light->intensity * light_intensity_ratio;
-          color.r = min(255, color.r + light_intensity_scaled);
-          color.g = min(255, color.g + light_intensity_scaled);
-          color.b = min(255, color.b + light_intensity_scaled);
+          color.r = min(255, color.r * light->color.r * light_intensity_ratio);
+          color.g = min(255, color.g * light->color.g * light_intensity_ratio);
+          color.b = min(255, color.b * light->color.b * light_intensity_ratio);
         }
 
         DrawPixel(x + halfScreenWidth, -y + halfScreenHeight, color);

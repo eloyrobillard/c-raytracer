@@ -1,12 +1,11 @@
 #ifndef RAYTRACER_H
 #define RAYTRACER_H
-#include "camera.h"
+
 #include "raylib.h"
 #include "vec3.h"
 
 typedef enum { SPHERE, SQUARE, PLANE } ObjectType;
 typedef enum { DIFFUSE = 0, METAL = 1 } ObjectMaterial;
-typedef enum { DIRECTIONAL } RTLightType;
 
 typedef struct {
   ObjectType type;
@@ -18,21 +17,27 @@ typedef struct {
   ObjectMaterial material;
   Color color;
 } Object;
+//
+// Light type
+typedef enum { LIGHT_DIRECTIONAL = 0, LIGHT_POINT } LightType;
 
 typedef struct {
-  RTLightType type;
-  Vec3 direction;
-  double intensity;
-} RTLight;
+  int type;
+  bool enabled;
+  Vector3 position;
+  Vector3 target;
+  Color color;
+  float attenuation;
+} Light;
 
 typedef struct {
   Object *objects;
   int num_objects;
-  RTLight *lights;
+  Light *lights;
   int num_lights;
 } World;
 
-void trace_rays(int, int, RTCamera *camera, World *world);
-double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sphere_center, const RTLight *light);
+void trace_rays(int halfScreenWidth, int halfScreenHeight, Camera *camera, World *world);
+double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sphere_center, const Light *light);
 Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, const Vec3 *point);
 #endif

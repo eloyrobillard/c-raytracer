@@ -1,13 +1,10 @@
 #ifndef CAMERA_H
 #define CAMERA_H
+#include <raylib.h>
+
 #include "vec3.h"
 
-typedef struct {
-  Vec3 global_position;
-  Vec3 global_rotation;
-} RTCamera;
-
-void move_camera(RTCamera *camera, float delta);
-void tilt_camera(RTCamera *camera, float delta);
+void move_camera(Camera *camera, float delta);
+void tilt_camera(Camera *camera, float delta);
 
 #endif
