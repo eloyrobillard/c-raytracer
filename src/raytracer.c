@@ -75,7 +75,7 @@ double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sph
 Color computeBgColor(int screenHeight, int y) {
   // NOTE: Using fixed point arithmetic.
   // See: https://www.3dgep.com/cpp-fast-track-14-fixed-point/
-  int norm_y = (y * 1024 / screenHeight);
+  int norm_y = (y * 255 / screenHeight);
 
   Vec3 res = vec3_add(&(Vec3){(255 - norm_y), (255 - norm_y), (255 - norm_y)},
                       &(Vec3){(128 * norm_y) >> 8, (179 * norm_y) >> 8, norm_y});
@@ -125,7 +125,7 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, Camera *camera, World
 
         DrawPixel(x + halfScreenWidth, -y + halfScreenHeight, color);
       } else {
-        Color bgColor = computeBgColor(halfScreenHeight * 2, y / 2);
+        Color bgColor = computeBgColor(halfScreenHeight * 2, y + halfScreenHeight);
         DrawPixel(x + halfScreenWidth, -y + halfScreenHeight, bgColor);
       }
     }
