@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
                                      .radius = 400000,
                                  }};
 
-  Light lights[NUM_LIGHTS] = {(Light){LIGHT_DIRECTIONAL, 1, {-1, 1, -1}, {0, 0, 0}}};
+  Light lights[NUM_LIGHTS] = {{LIGHT_DIRECTIONAL, 1, {-1, 1, -1}, {0, 0, 0}, {1, 1, 1, 1}}};
   World world = {.objects = objects, .num_objects = NUM_SPHERES, .lights = lights, .num_lights = NUM_LIGHTS};
 
   Camera camera = {0};
@@ -62,7 +62,6 @@ int main(int argc, char **argv) {
     if (IsKeyDown(KEY_W))
       direction_fb -= 1;
 
-    // UpdateCamera(&camera, CAMERA_ORBITAL);
     double theta = atan2(camera.position.z, camera.position.x);
     camera.position.x += cos(theta) * direction_fb * SPEED;
     camera.position.z += sin(theta) * direction_fb * SPEED;
