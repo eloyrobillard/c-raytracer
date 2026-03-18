@@ -37,7 +37,12 @@ typedef struct {
   int num_lights;
 } World;
 
+typedef struct {
+  Vec3 point;
+  Vec3 normal;
+  int didHit;
+} HitInfo;
+
 void trace_rays(int halfScreenWidth, int halfScreenHeight, Camera *camera, World *world);
-double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sphere_center, const Light *light);
 Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, const Vec3 *point);
 #endif

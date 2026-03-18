@@ -2,6 +2,8 @@
 #include <math.h>
 #include <raylib.h>
 #include <raymath.h>
+#include <stdlib.h>
+#include <time.h>
 
 #define NUM_SPHERES 4
 #define NUM_LIGHTS 1
@@ -11,6 +13,8 @@ int main(int argc, char **argv) {
   const int screenHeight = 1080;
   const int halfWidth = screenWidth / 2;
   const int halfHeight = screenHeight / 2;
+
+  srand(time(NULL));
 
   InitWindow(screenWidth, screenHeight, "Raytracer");
   SetTargetFPS(60);

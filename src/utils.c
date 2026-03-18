@@ -1,4 +1,4 @@
-#include <assert.h>
+#include "utils.h"
 
 int min(int a, int b) { return (a < b) ? a : b; }
 
@@ -11,4 +11,16 @@ double clamp(double in, double from, double to) {
   if (in < from)
     return from;
   return in;
+}
+
+double random_double(double min, double max) {
+  // [min,max) の実数乱数を返す
+  return min + (max - min) * rand() / (RAND_MAX + 1.0);
+}
+
+Vec3 random_unit_vector() {
+  double a = random_double(0, 2 * PI);
+  double z = random_double(-1, 1);
+  double r = sqrt(1 - z * z);
+  return (Vec3){r * cos(a), r * sin(a), z};
 }
