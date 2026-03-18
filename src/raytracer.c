@@ -1,5 +1,4 @@
 #include "raytracer.h"
-#include "utils.h"
 #include "vec3.h"
 #include <assert.h>
 #include <math.h>
@@ -10,15 +9,17 @@ double intersects_with_sphere(Vec3 *camera, const Vec3 *v, const Vec3 *camera_to
   double mag_sqr_v = vec3_magnitude_squared(v);
 
   double mag_sqr_c = vec3_magnitude_squared(camera_to_sphere_center);
-  double dot_cv = vec3_dot(v, camera_to_sphere_center);
 
-  double delta = 4 * dot_cv * dot_cv - 4 * mag_sqr_v * (mag_sqr_c - radius * radius);
+  double b = vec3_dot(v, camera_to_sphere_center);
+  double c = mag_sqr_c - radius * radius;
+
+  double delta = b * b - mag_sqr_v * c;
   if (delta < 0)
     return INFINITY;
 
   double sqrt_delta = sqrt(delta);
-  double l1 = (2 * dot_cv - sqrt_delta) / (2 * mag_sqr_v);
-  double l2 = (2 * dot_cv + sqrt_delta) / (2 * mag_sqr_v);
+  double l1 = (2 * b - sqrt_delta) / (2 * mag_sqr_v);
+  double l2 = (2 * b + sqrt_delta) / (2 * mag_sqr_v);
 
   if (l1 > 0 && l1 < l2)
     return l1;
@@ -48,30 +49,6 @@ Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, c
   return reflected_vector;
 }
 
-double compute_light_intensity_ratio_at_point(const Vec3 *point, const Vec3 *sphere_center, const Light *light) {
-  const Vec3 normal = vec3_difference(point, sphere_center);
-  const Vec3 unit_normal = normalized(&normal);
-
-  // TODO: don't normalize every time
-  Vec3 light_dir = vec3_difference(&light->position, &light->target);
-  const Vec3 unit_light = normalized(&light_dir);
-  const Vec3 unit_point = normalized(point);
-
-  // Direction vector of line from point on object to tip of reflected light vector
-  const Vec3 direction_vec_reflection = reflection_of_vector_at_point(&unit_light, &unit_normal, point);
-
-  // Reflected vector should have (about) the same length as the unit light vector (= 1)
-  assert(absf(vec3_magnitude(&direction_vec_reflection) - vec3_magnitude(&unit_light)) < 0.1);
-
-  const Vec3 unit_reflection_vec = normalized(&direction_vec_reflection);
-
-  // We get a light intensity equal to the "percentage" of light coming our way
-  // This is to simulate light scattering in some way
-  const double result = vec3_dot(&unit_reflection_vec, &unit_point);
-
-  return result < 0 ? -result : 0;
-}
-
 Color computeBgColor(int screenHeight, int y) {
   // NOTE: Using fixed point arithmetic.
   // See: https://www.3dgep.com/cpp-fast-track-14-fixed-point/
@@ -93,7 +70,6 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, Camera *camera, World
 
       double min_lambda = INFINITY;
       Color color = WHITE;
-      Vec3 camera_to_sphere_center = {0, 0, 0};
       for (int obji = 0; obji < world->num_objects; obji++) {
         Object *object = &world->objects[obji];
 
@@ -105,24 +81,12 @@ void trace_rays(int halfScreenWidth, int halfScreenHeight, Camera *camera, World
           if (lambda < min_lambda) {
             min_lambda = lambda;
             color = object->color;
-            camera_to_sphere_center = cs;
           }
         } break;
         }
       }
 
       if (min_lambda < INFINITY) {
-        for (int i = 0; i < world->num_lights; i++) {
-          Light *light = &world->lights[i];
-          Vec3 point = vec3_scalar_mul(&v, min_lambda);
-          double light_intensity_ratio =
-              compute_light_intensity_ratio_at_point(&point, &camera_to_sphere_center, light);
-
-          color.r = min(255, color.r * light->color.r * light_intensity_ratio);
-          color.g = min(255, color.g * light->color.g * light_intensity_ratio);
-          color.b = min(255, color.b * light->color.b * light_intensity_ratio);
-        }
-
         DrawPixel(x + halfScreenWidth, -y + halfScreenHeight, color);
       } else {
         Color bgColor = computeBgColor(halfScreenHeight * 2, y + halfScreenHeight);
