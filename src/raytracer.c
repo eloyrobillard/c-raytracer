@@ -6,7 +6,7 @@
 #include <raylib.h>
 #include <stdbool.h>
 
-double intersects_with_sphere(const Ray *ray, Object *sphere) {
+double intersects_with_sphere(const Ray *ray, Object *sphere, double tmin, double tmax) {
   double mag_sqr_v = vec3_magnitude_squared(&ray->direction);
   Vec3 camera_to_sphere_center = vec3_difference(&sphere->pos_center, &ray->position);
 
@@ -20,13 +20,13 @@ double intersects_with_sphere(const Ray *ray, Object *sphere) {
     return INFINITY;
 
   double sqrt_delta = sqrt(delta);
-  double l1 = (2 * b - sqrt_delta) / (2 * mag_sqr_v);
-  double l2 = (2 * b + sqrt_delta) / (2 * mag_sqr_v);
+  double t1 = (2 * b - sqrt_delta) / (2 * mag_sqr_v);
+  double t2 = (2 * b + sqrt_delta) / (2 * mag_sqr_v);
 
-  if (l1 > 0 && l1 < l2)
-    return l1;
-  else if (l2 > 0)
-    return l2;
+  if (t1 > tmin && t1 < tmax)
+    return t1;
+  else if (t2 > tmin && t2 < tmax)
+    return t2;
   else
     return INFINITY;
 }
@@ -56,7 +56,7 @@ Color computeBgColor(const Ray *ray, int y) {
 
   // NOTE: Using fixed point arithmetic.
   // See: https://www.3dgep.com/cpp-fast-track-14-fixed-point/
-  int t = 128 * (unit_direction.y + 255);
+  int t = (int)(128 * (unit_direction.y + 255)) >> 8;
 
   Vec3 res = vec3_add(&(Vec3){(255 - t), (255 - t), (255 - t)}, &(Vec3){(128 * t) >> 8, (179 * t) >> 8, t});
 
@@ -67,6 +67,7 @@ Vec3 get_sphere_normal(const Object *sphere, const Vec3 *point) { return vec3_di
 
 HitInfo hit(const Ray *ray, const World *world, double tmin, double tmax) {
   HitInfo rec;
+  rec.didHit = 0;
   double min_lambda = INFINITY;
 
   for (int obji = 0; obji < world->num_objects; obji++) {
@@ -75,7 +76,7 @@ HitInfo hit(const Ray *ray, const World *world, double tmin, double tmax) {
     switch (object->type) {
     case SPHERE: {
       Vec3 cs = vec3_difference(&object->pos_center, &ray->position);
-      double lambda = intersects_with_sphere(ray, object);
+      double lambda = intersects_with_sphere(ray, object, tmin, tmax);
 
       if (lambda < min_lambda) {
         min_lambda = lambda;
@@ -95,7 +96,7 @@ Color ray_color(const Ray *ray, const World *world, int depth) {
   HitInfo rec = hit(ray, world, 0.0, INFINITY);
 
   if (depth <= 0) {
-    return (Color){0, 0, 0, 0};
+    return (Color){0};
   }
 
   if (rec.didHit) {
@@ -111,7 +112,7 @@ Color ray_color(const Ray *ray, const World *world, int depth) {
 void trace_rays(int halfScreenWidth, int halfScreenHeight, Camera *camera, World *world) {
   for (int x = -halfScreenWidth; x < halfScreenWidth; x++) {
     for (int y = -halfScreenHeight; y < halfScreenHeight; y++) {
-      Vec3 direction = {camera->position.x + x, camera->position.y + y, camera->position.z + halfScreenWidth};
+      Vec3 direction = {camera->target.x + x, camera->target.y + y, camera->target.z - camera->position.z};
       Vec3 x_rot_direction = rot_x_around_point(&camera->position, &direction, camera->target.x);
       Vec3 y_rot_direction = rot_y_around_point(&camera->position, &x_rot_direction, camera->target.y);
 
