@@ -32,24 +32,10 @@ double intersects_with_sphere(const TRay *ray, Object *sphere, double tmin, doub
   return INFINITY;
 }
 
-Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, const Vec3 *point) {
-  const double dot_nl = vec3_dot(normal, to_reflect);
-
-  assert(vec3_magnitude(normal) < 1.01);
-
-  if (dot_nl >= 0)
-    return *to_reflect;
-
-  const Vec3 scaled_normal = vec3_scalar_mul(normal, -dot_nl);
-  // Place the scaled normal in global coordinates to get the coordinates of its tip
-  const Vec3 projected_on_normal = vec3_add(point, &scaled_normal);
-  const Vec3 to_proj_point = vec3_add(&scaled_normal, to_reflect);
-  // Get symmetrical reflection of base of light vector (if it was in global coordinates)
-  // through normal vector
-  const Vec3 reflected_point = vec3_add(&projected_on_normal, &to_proj_point);
-  const Vec3 reflected_vector = vec3_difference(&reflected_point, point);
-
-  return reflected_vector;
+Vec3 reflect(const Vec3 *v, const Vec3 *n) {
+  double factor = 2 * vec3_dot(v, n);
+  Vec3 new_n = vec3_scalar_mul(n, factor);
+  return vec3_difference(v, &new_n);
 }
 
 Vec3 computeBgColor(const TRay *ray) {
@@ -86,6 +72,8 @@ HitInfo hit(const TRay *ray, const World *world, double tmin, double tmax) {
         rec.didHit = 1;
       }
     } break;
+    default:
+      break;
     }
   }
 
