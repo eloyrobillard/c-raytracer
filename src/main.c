@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 
   Object objects[NUM_SPHERES] = {{
                                      .type = SPHERE,
-                                     .pos_center = {.x = 0, .y = 0, .z = 0},
+                                     .pos_center = {.x = 0, .y = 0, .z = 1.0},
                                      .color = RED,
                                      .material = DIFFUSE,
                                      .radius = 0.5f,
@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
                                  // },
                                  {
                                      .type = SPHERE,
-                                     .pos_center = {.x = 0, .y = -100.5f, .z = 0.0f},
+                                     .pos_center = {.x = 0, .y = -100.5, .z = 1.0},
                                      .color = GREEN,
                                      .material = DIFFUSE,
                                      .radius = 100.0f,
@@ -53,9 +53,9 @@ int main(int argc, char **argv) {
   World world = {.objects = objects, .num_objects = NUM_SPHERES, .lights = lights, .num_lights = NUM_LIGHTS};
 
   TCamera camera = {0};
-  camera.position = (Vec3){0.0, 0.0, -1.0}; // Camera position
-  camera.target = (Vec3){0.0, 0.0, 0.0};    // Camera looking at point
-  camera.up = (Vec3){0.0, 1.0, 0.0};        // Camera up vector (rotation towards target)
+  camera.position = (Vec3){0.0, 0.0, 0.0}; // Camera position
+  camera.target = (Vec3){0.0, 0.0, 1.0};   // Camera looking at point
+  camera.up = (Vec3){0.0, 1.0, 0.0};       // Camera up vector (rotation towards target)
 
   const int SPEED = 4;
   while (!WindowShouldClose()) {
