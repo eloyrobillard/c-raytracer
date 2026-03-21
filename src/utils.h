@@ -10,5 +10,6 @@ double absf(double a);
 double clamp(double in, double from, double to);
 
 double random_double(double min, double max);
+Vec3 random_in_unit_sphere();
 Vec3 random_unit_vector();
 #endif

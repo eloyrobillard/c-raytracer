@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "vec3.h"
 #include <raylib.h>
 
 int min(int a, int b) { return (a < b) ? a : b; }
@@ -19,9 +20,18 @@ double random_double(double min, double max) {
   return min + (max - min) * rand() / (RAND_MAX + 1.0);
 }
 
+Vec3 random_in_unit_sphere() {
+  while (true) {
+    Vec3 p = {random_double(-1.0, 1.0), random_double(-1.0, 1.0), random_double(-1.0, 1.0)};
+    if (vec3_magnitude_squared(&p) >= 1)
+      continue;
+    return p;
+  }
+}
+
 Vec3 random_unit_vector() {
   double a = random_double(0.0, 2.0 * PI);
-  double z = random_double(-1.0, 1);
+  double z = random_double(-1.0, 1.0);
   double r = sqrt(1.0 - z * z);
   return (Vec3){r * cos(a), r * sin(a), z};
 }
