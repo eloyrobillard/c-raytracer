@@ -17,24 +17,10 @@ typedef struct {
   ObjectMaterial material;
   Vec3 albedo;
 } Object;
-//
-// Light type
-typedef enum { LIGHT_DIRECTIONAL = 0, LIGHT_POINT } LightType;
-
-typedef struct {
-  int type;
-  bool enabled;
-  Vector3 position;
-  Vector3 target;
-  Color color;
-  double attenuation;
-} Light;
 
 typedef struct {
   Object *objects;
   int num_objects;
-  Light *lights;
-  int num_lights;
 } World;
 
 typedef struct {
@@ -52,5 +38,4 @@ typedef struct {
 
 void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, TCamera *camera,
                 World *world);
-Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, const Vec3 *point);
 #endif

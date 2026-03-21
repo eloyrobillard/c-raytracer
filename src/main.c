@@ -6,7 +6,6 @@
 #include <time.h>
 
 #define NUM_SPHERES 4
-#define NUM_LIGHTS 1
 
 int main(int argc, char **argv) {
   const double aspectRatio = 16.0 / 9.0;
@@ -49,8 +48,7 @@ int main(int argc, char **argv) {
                                      .radius = 100.0,
                                  }};
 
-  Light lights[NUM_LIGHTS] = {{LIGHT_DIRECTIONAL, 1, {-1, 1, -1}, {0, 0, 0}, {1, 1, 1, 1}}};
-  World world = {.objects = objects, .num_objects = NUM_SPHERES, .lights = lights, .num_lights = NUM_LIGHTS};
+  World world = {.objects = objects, .num_objects = NUM_SPHERES};
 
   TCamera camera = {0};
   camera.position = (Vec3){0.0, 0.0, 0.0}; // Camera position
