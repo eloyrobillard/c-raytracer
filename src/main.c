@@ -19,7 +19,6 @@ int main(int argc, char **argv) {
   srand(time(NULL));
 
   InitWindow(imgWidth, imgHeight, "Raytracer");
-  SetTargetFPS(60);
 
   Object objects[NUM_SPHERES] = {{
                                      .type = SPHERE,
@@ -74,11 +73,7 @@ int main(int argc, char **argv) {
 
     BeginDrawing();
 
-    ClearBackground(BLACK);
-
     trace_rays(viewportWidth, viewportHeight, imgWidth, imgHeight, &camera, &world);
-
-    DrawFPS(10, 10);
 
     EndDrawing();
   }

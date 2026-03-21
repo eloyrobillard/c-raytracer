@@ -5,6 +5,7 @@
 #include <math.h>
 #include <raylib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 double intersects_with_sphere(const Ray *ray, Object *sphere, double tmin, double tmax) {
   double mag_sqr_v = vec3_magnitude_squared(&ray->direction);
@@ -113,6 +114,8 @@ void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int i
                 World *world) {
   Vec3 lowerLeftCorner = {-viewportWidth / 2.0, -viewportHeight / 2.0, 0.0};
   for (int x = 0; x < imgWidth; x++) {
+    printf("Scan columns remaining: %d\n", imgWidth - x - 1);
+
     for (int y = 0; y < imgHeight; y++) {
       Vec3 direction = {camera->target.x + x / ((double)imgWidth - 1), camera->target.y + y / ((double)imgHeight - 1),
                         camera->target.z - camera->position.z};
@@ -127,4 +130,6 @@ void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int i
       DrawPixel(x, -y + imgHeight, color);
     }
   }
+
+  printf("Done!\n");
 }
