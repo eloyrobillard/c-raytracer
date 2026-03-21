@@ -7,28 +7,29 @@
 #include <stdio.h>
 
 double intersects_with_sphere(const TRay *ray, Object *sphere, double tmin, double tmax) {
-  double mag_sqr_v = vec3_magnitude_squared(&ray->direction);
+  double a = vec3_magnitude_squared(&ray->direction);
   Vec3 camera_to_sphere_center = vec3_difference(&sphere->pos_center, &ray->origin);
 
   double mag_sqr_c = vec3_magnitude_squared(&camera_to_sphere_center);
 
-  double b = vec3_dot(&ray->direction, &camera_to_sphere_center);
+  double half_b = -vec3_dot(&ray->direction, &camera_to_sphere_center);
   double c = mag_sqr_c - sphere->radius * sphere->radius;
 
-  double delta = b * b - mag_sqr_v * c;
-  if (delta < 0)
+  double discriminant = half_b * half_b - a * c;
+  if (discriminant < 0)
     return INFINITY;
 
-  double sqrt_delta = sqrt(delta);
-  double t1 = (2 * b - sqrt_delta) / (2 * mag_sqr_v);
-  double t2 = (2 * b + sqrt_delta) / (2 * mag_sqr_v);
+  double root = sqrt(discriminant);
+  double t1 = (-half_b - root) / a;
 
-  if (t1 > tmin && t1 < tmax)
+  if (tmin < t1 && t1 < tmax)
     return t1;
-  else if (t2 > tmin && t2 < tmax)
+
+  double t2 = (-half_b + root) / a;
+  if (tmin < t2 && t2 < tmax)
     return t2;
-  else
-    return INFINITY;
+
+  return INFINITY;
 }
 
 Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, const Vec3 *point) {
