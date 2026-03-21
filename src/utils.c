@@ -20,8 +20,8 @@ double random_double(double min, double max) {
 }
 
 Vec3 random_unit_vector() {
-  double a = random_double(0, 2 * PI);
-  double z = random_double(-1, 1);
-  double r = sqrt(1 - z * z);
+  double a = random_double(0.0, 2.0 * PI);
+  double z = random_double(-1.0, 1);
+  double r = sqrt(1.0 - z * z);
   return (Vec3){r * cos(a), r * sin(a), z};
 }
