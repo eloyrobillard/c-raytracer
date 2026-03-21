@@ -5,18 +5,22 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define NUM_SPHERES 4
+#define NUM_SPHERES 2
 #define NUM_LIGHTS 1
 
 int main(int argc, char **argv) {
-  const int screenWidth = 1920;
-  const int screenHeight = 1080;
-  const int halfWidth = screenWidth / 2;
-  const int halfHeight = screenHeight / 2;
+  const int imgWidth = 1920;
+  const int imgHeight = 1080;
+  const int halfWidth = imgWidth / 2;
+  const int halfHeight = imgHeight / 2;
+
+  const double aspectRatio = (double)imgWidth / (double)imgHeight;
+  const double viewportHeight = 2.0;
+  const double viewportWidth = viewportHeight * aspectRatio;
 
   srand(time(NULL));
 
-  InitWindow(screenWidth, screenHeight, "Raytracer");
+  InitWindow(imgWidth, imgHeight, "Raytracer");
   SetTargetFPS(60);
 
   Object objects[NUM_SPHERES] = {{
@@ -24,38 +28,38 @@ int main(int argc, char **argv) {
                                      .pos_center = {.x = 0, .y = 0, .z = 0},
                                      .color = RED,
                                      .material = DIFFUSE,
-                                     .radius = 400,
+                                     .radius = 0.5f,
                                  },
+                                 // {
+                                 //     .type = SPHERE,
+                                 //     .pos_center = {.x = 1000, .y = 0, .z = 0},
+                                 //     .color = YELLOW,
+                                 //     .material = METAL,
+                                 //     .radius = 400,
+                                 // },
+                                 // {
+                                 //     .type = SPHERE,
+                                 //     .pos_center = {.x = -1000, .y = 0, .z = 0},
+                                 //     .color = BLUE,
+                                 //     .material = METAL,
+                                 //     .radius = 400,
+                                 // },
                                  {
                                      .type = SPHERE,
-                                     .pos_center = {.x = 1000, .y = 0, .z = 0},
-                                     .color = YELLOW,
-                                     .material = METAL,
-                                     .radius = 400,
-                                 },
-                                 {
-                                     .type = SPHERE,
-                                     .pos_center = {.x = -1000, .y = 0, .z = 0},
-                                     .color = BLUE,
-                                     .material = METAL,
-                                     .radius = 400,
-                                 },
-                                 {
-                                     .type = SPHERE,
-                                     .pos_center = {.x = 0, .y = -400400, .z = 0},
+                                     .pos_center = {.x = 0, .y = -100.5f, .z = 0.0f},
                                      .color = GREEN,
                                      .material = DIFFUSE,
-                                     .radius = 400000,
+                                     .radius = 100.0f,
                                  }};
 
   Light lights[NUM_LIGHTS] = {{LIGHT_DIRECTIONAL, 1, {-1, 1, -1}, {0, 0, 0}, {1, 1, 1, 1}}};
   World world = {.objects = objects, .num_objects = NUM_SPHERES, .lights = lights, .num_lights = NUM_LIGHTS};
 
   Camera camera = {0};
-  camera.position = (Vector3){0.0f, 0.0f, -(float)halfWidth}; // Camera position
-  camera.target = (Vector3){0.0f, 0.0f, 0.0f};                // Camera looking at point
-  camera.up = (Vector3){0.0f, 1.0f, 0.0f};                    // Camera up vector (rotation towards target)
-  camera.fovy = 45.0f;                                        // Camera field-of-view Y
+  camera.position = (Vector3){0.0f, 0.0f, -1.0f}; // Camera position
+  camera.target = (Vector3){0.0f, 0.0f, 0.0f};    // Camera looking at point
+  camera.up = (Vector3){0.0f, 1.0f, 0.0f};        // Camera up vector (rotation towards target)
+  camera.fovy = 45.0f;                            // Camera field-of-view Y
   camera.projection = CAMERA_PERSPECTIVE;
 
   const int SPEED = 4;
@@ -74,7 +78,7 @@ int main(int argc, char **argv) {
 
     ClearBackground(BLACK);
 
-    trace_rays(halfWidth, halfHeight, &camera, &world);
+    trace_rays(viewportWidth, viewportHeight, imgWidth, imgHeight, &camera, &world);
 
     DrawFPS(10, 10);
 

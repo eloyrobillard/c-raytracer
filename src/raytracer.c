@@ -75,7 +75,6 @@ HitInfo hit(const Ray *ray, const World *world, double tmin, double tmax) {
 
     switch (object->type) {
     case SPHERE: {
-      Vec3 cs = vec3_difference(&object->pos_center, &ray->position);
       double lambda = intersects_with_sphere(ray, object, tmin, tmax);
 
       if (lambda < min_lambda) {
@@ -109,18 +108,22 @@ Color ray_color(const Ray *ray, const World *world, int depth) {
   return computeBgColor(ray, ray->direction.y);
 }
 
-void trace_rays(int halfScreenWidth, int halfScreenHeight, Camera *camera, World *world) {
-  for (int x = -halfScreenWidth; x < halfScreenWidth; x++) {
-    for (int y = -halfScreenHeight; y < halfScreenHeight; y++) {
-      Vec3 direction = {camera->target.x + x, camera->target.y + y, camera->target.z - camera->position.z};
-      Vec3 x_rot_direction = rot_x_around_point(&camera->position, &direction, camera->target.x);
-      Vec3 y_rot_direction = rot_y_around_point(&camera->position, &x_rot_direction, camera->target.y);
+void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, Camera *camera,
+                World *world) {
+  Vec3 lowerLeftCorner = {-viewportWidth / 2.0, -viewportHeight / 2.0, 0.0};
+  for (int x = 0; x < imgWidth; x++) {
+    for (int y = 0; y < imgHeight; y++) {
+      Vec3 direction = {camera->target.x + x / ((double)imgWidth - 1), camera->target.y + y / ((double)imgHeight - 1),
+                        camera->target.z - camera->position.z};
+      // Vec3 x_rot_direction = rot_x_around_point(&camera->position, &direction, camera->target.x);
+      // Vec3 y_rot_direction = rot_y_around_point(&camera->position, &x_rot_direction, camera->target.y);
 
-      Ray ray = {camera->position, y_rot_direction};
+      Ray ray = {camera->position, (Vec3){lowerLeftCorner.x + direction.x * viewportWidth,
+                                          lowerLeftCorner.y + direction.y * viewportHeight, direction.z}};
 
       Color color = ray_color(&ray, world, 50);
 
-      DrawPixel(x + halfScreenWidth, -y + halfScreenHeight, color);
+      DrawPixel(x, -y + imgHeight, color);
     }
   }
 }

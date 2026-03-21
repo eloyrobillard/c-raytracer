@@ -43,6 +43,6 @@ typedef struct {
   int didHit;
 } HitInfo;
 
-void trace_rays(int halfScreenWidth, int halfScreenHeight, Camera *camera, World *world);
+void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, Camera *camera, World *world);
 Vec3 reflection_of_vector_at_point(const Vec3 *to_reflect, const Vec3 *normal, const Vec3 *point);
 #endif
