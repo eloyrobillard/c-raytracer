@@ -129,15 +129,12 @@ Vec3 ray_color(const TRay *ray, const World *world, int depth) {
 void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, TCamera *camera,
                 World *world) {
   double samplesPerPixel = 64.0;
-  Vec3 lowerLeftCorner = {-viewportWidth / 2.0, -viewportHeight / 2.0, 0.0};
+  Vec3 lowerLeftCorner = {-viewportWidth / 2.0, -viewportHeight / 2.0, 1.0};
 
-  for (int x = 0; x < imgWidth; x++) {
-    printf("Scan columns remaining: %d\n", imgWidth - x - 1);
+  for (int y = 0; y < imgHeight; y++) {
+    printf("Scan rows remaining: %d\n", imgHeight - y - 1);
 
-    for (int y = 0; y < imgHeight; y++) {
-      // Vec3 x_rot_direction = rot_x_around_point(&camera->position, &direction, camera->target.x);
-      // Vec3 y_rot_direction = rot_y_around_point(&camera->position, &x_rot_direction, camera->target.y);
-
+    for (int x = 0; x < imgWidth; x++) {
       double r = 0.0, g = 0.0, b = 0.0;
 
       for (int s = 0; s < samplesPerPixel; s++) {
@@ -146,7 +143,7 @@ void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int i
                           camera->target.z - camera->position.z};
 
         TRay ray = {camera->position, (Vec3){lowerLeftCorner.x + direction.x * viewportWidth,
-                                             lowerLeftCorner.y + direction.y * viewportHeight, direction.z}};
+                                             lowerLeftCorner.y + direction.y * viewportHeight, lowerLeftCorner.z}};
 
         Vec3 color = ray_color(&ray, world, 50);
         r += color.x;
