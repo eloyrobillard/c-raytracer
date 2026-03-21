@@ -9,12 +9,10 @@
 #define NUM_LIGHTS 1
 
 int main(int argc, char **argv) {
-  const int imgWidth = 1920;
-  const int imgHeight = 1080;
-  const int halfWidth = imgWidth / 2;
-  const int halfHeight = imgHeight / 2;
+  const double aspectRatio = 16.0 / 9.0;
+  const int imgWidth = 384 * 4;
+  const int imgHeight = (int)(imgWidth / aspectRatio);
 
-  const double aspectRatio = (double)imgWidth / (double)imgHeight;
   const double viewportHeight = 2.0;
   const double viewportWidth = viewportHeight * aspectRatio;
 
