@@ -112,22 +112,37 @@ Color ray_color(const Ray *ray, const World *world, int depth) {
 
 void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, Camera *camera,
                 World *world) {
+  int samplesPerPixel = 64;
   Vec3 lowerLeftCorner = {-viewportWidth / 2.0, -viewportHeight / 2.0, 0.0};
+
   for (int x = 0; x < imgWidth; x++) {
     printf("Scan columns remaining: %d\n", imgWidth - x - 1);
 
     for (int y = 0; y < imgHeight; y++) {
-      Vec3 direction = {camera->target.x + x / ((double)imgWidth - 1), camera->target.y + y / ((double)imgHeight - 1),
-                        camera->target.z - camera->position.z};
       // Vec3 x_rot_direction = rot_x_around_point(&camera->position, &direction, camera->target.x);
       // Vec3 y_rot_direction = rot_y_around_point(&camera->position, &x_rot_direction, camera->target.y);
 
-      Ray ray = {camera->position, (Vec3){lowerLeftCorner.x + direction.x * viewportWidth,
-                                          lowerLeftCorner.y + direction.y * viewportHeight, direction.z}};
+      int r = 0, g = 0, b = 0;
 
-      Color color = ray_color(&ray, world, 50);
+      for (int s = 0; s < samplesPerPixel; s++) {
+        Vec3 direction = {camera->target.x + (random_double(0.0, 1.0) + x) / ((double)imgWidth - 1),
+                          camera->target.y + (random_double(0.0, 1.0) + y) / ((double)imgHeight - 1),
+                          camera->target.z - camera->position.z};
 
-      DrawPixel(x, -y + imgHeight, color);
+        Ray ray = {camera->position, (Vec3){lowerLeftCorner.x + direction.x * viewportWidth,
+                                            lowerLeftCorner.y + direction.y * viewportHeight, direction.z}};
+
+        Color color = ray_color(&ray, world, 50);
+        r += color.r;
+        g += color.g;
+        b += color.b;
+      }
+
+      r >>= 6;
+      g >>= 6;
+      b >>= 6;
+
+      DrawPixel(x, -y + imgHeight, (Color){r, g, b, 255});
     }
   }
 
