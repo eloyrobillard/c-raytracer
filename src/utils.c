@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <raylib.h>
 
 int min(int a, int b) { return (a < b) ? a : b; }
 

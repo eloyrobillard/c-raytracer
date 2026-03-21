@@ -10,7 +10,7 @@
 
 int main(int argc, char **argv) {
   const double aspectRatio = 16.0 / 9.0;
-  const int imgWidth = 384 * 4;
+  const int imgWidth = 384 * 2;
   const int imgHeight = (int)(imgWidth / aspectRatio);
 
   const double viewportHeight = 2.0;
@@ -52,12 +52,10 @@ int main(int argc, char **argv) {
   Light lights[NUM_LIGHTS] = {{LIGHT_DIRECTIONAL, 1, {-1, 1, -1}, {0, 0, 0}, {1, 1, 1, 1}}};
   World world = {.objects = objects, .num_objects = NUM_SPHERES, .lights = lights, .num_lights = NUM_LIGHTS};
 
-  Camera camera = {0};
-  camera.position = (Vector3){0.0f, 0.0f, -1.0f}; // Camera position
-  camera.target = (Vector3){0.0f, 0.0f, 0.0f};    // Camera looking at point
-  camera.up = (Vector3){0.0f, 1.0f, 0.0f};        // Camera up vector (rotation towards target)
-  camera.fovy = 45.0f;                            // Camera field-of-view Y
-  camera.projection = CAMERA_PERSPECTIVE;
+  TCamera camera = {0};
+  camera.position = (Vec3){0.0, 0.0, -1.0}; // Camera position
+  camera.target = (Vec3){0.0, 0.0, 0.0};    // Camera looking at point
+  camera.up = (Vec3){0.0, 1.0, 0.0};        // Camera up vector (rotation towards target)
 
   const int SPEED = 4;
   while (!WindowShouldClose()) {
