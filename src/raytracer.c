@@ -93,11 +93,11 @@ HitInfo hit(const Ray *ray, const World *world, double tmin, double tmax) {
 }
 
 Color ray_color(const Ray *ray, const World *world, int depth) {
-  HitInfo rec = hit(ray, world, 0.0, INFINITY);
-
   if (depth <= 0) {
     return (Color){0};
   }
+
+  HitInfo rec = hit(ray, world, 0.001, INFINITY);
 
   if (rec.didHit) {
     Vec3 target = random_unit_vector();
