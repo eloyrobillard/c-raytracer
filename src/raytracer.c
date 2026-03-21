@@ -131,9 +131,11 @@ void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int i
         b += color.z;
       }
 
-      r /= samplesPerPixel;
-      g /= samplesPerPixel;
-      b /= samplesPerPixel;
+      // 色の合計をサンプルの数で割り、gamma = 2.0 のガンマ補正を行う
+      double scale = 1.0 / samplesPerPixel;
+      r = sqrt(scale * r);
+      g = sqrt(scale * g);
+      b = sqrt(scale * b);
 
       DrawPixel(x, -y + imgHeight,
                 (Color){256.0 * clamp(r, 0.0, 0.999), 256.0 * clamp(g, 0.0, 0.999), 256.0 * clamp(b, 0.0, 0.999), 255});
