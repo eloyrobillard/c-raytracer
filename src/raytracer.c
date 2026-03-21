@@ -76,8 +76,13 @@ HitInfo hit(const TRay *ray, const World *world, double tmin, double tmax) {
         min_lambda = lambda;
         rec.point = vec3_scalar_mul(&ray->direction, lambda);
         rec.point = vec3_difference(&rec.point, &ray->origin);
+
         rec.normal = get_sphere_normal(object, &rec.point);
         rec.normal = normalized(&rec.normal);
+        if (vec3_dot(&ray->direction, &rec.normal) > 0.0) {
+          rec.normal = vec3_scalar_mul(&rec.normal, -1.0);
+        }
+
         rec.didHit = 1;
       }
     } break;
