@@ -82,6 +82,7 @@ HitInfo hit(const Ray *ray, const World *world, double tmin, double tmax) {
         rec.point = vec3_scalar_mul(&ray->direction, lambda);
         rec.point = vec3_difference(&rec.point, &ray->position);
         rec.normal = get_sphere_normal(object, &rec.point);
+        rec.normal = normalized(&rec.normal);
         rec.didHit = 1;
       }
     } break;
