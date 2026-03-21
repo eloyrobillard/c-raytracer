@@ -69,6 +69,7 @@ HitInfo hit(const TRay *ray, const World *world, double tmin, double tmax) {
           rec.normal = vec3_scalar_mul(&rec.normal, -1.0);
         }
 
+        rec.object = object;
         rec.didHit = 1;
       }
     } break;
@@ -80,6 +81,32 @@ HitInfo hit(const TRay *ray, const World *world, double tmin, double tmax) {
   return rec;
 }
 
+TRay scatter_lambertian(const HitInfo *hinfo) {
+  Vec3 target = random_unit_vector();
+  target = vec3_add(&target, &hinfo->normal);
+  return (TRay){hinfo->point, target};
+}
+
+TRay scatter_metal(const HitInfo *hinfo, const TRay *r_in) {
+  Vec3 unit_direction = normalized(&r_in->direction);
+  Vec3 reflected = reflect(&unit_direction, &hinfo->normal);
+  TRay target = {hinfo->point, reflected};
+  return target;
+}
+
+int scatter(const HitInfo *rec, const TRay *ray, TRay *scattered) {
+  if (rec->object->material == DIFFUSE)
+    *scattered = scatter_lambertian(rec);
+  else {
+    *scattered = scatter_metal(rec, ray);
+    if (vec3_dot(&scattered->direction, &rec->normal) <= 0.0) {
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
 Vec3 ray_color(const TRay *ray, const World *world, int depth) {
   if (depth <= 0) {
     return (Vec3){0.0};
@@ -88,10 +115,12 @@ Vec3 ray_color(const TRay *ray, const World *world, int depth) {
   HitInfo rec = hit(ray, world, 0.001, INFINITY);
 
   if (rec.didHit) {
-    Vec3 target = random_unit_vector();
-    target = vec3_add(&target, &rec.normal);
-    Vec3 color = ray_color(&(TRay){rec.point, target}, world, depth - 1);
-    return (Vec3){color.x / 2.0, color.y / 2.0, color.z / 2.0};
+    TRay scattered;
+    if (scatter(&rec, ray, &scattered)) {
+      Vec3 color = ray_color(&scattered, world, depth - 1);
+      return (Vec3){color.x * rec.object->albedo.x, color.y * rec.object->albedo.y, color.z * rec.object->albedo.z};
+    }
+    return (Vec3){0.0, 0.0, 0.0};
   }
 
   return computeBgColor(ray);

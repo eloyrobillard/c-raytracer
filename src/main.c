@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define NUM_SPHERES 2
+#define NUM_SPHERES 4
 #define NUM_LIGHTS 1
 
 int main(int argc, char **argv) {
   const double aspectRatio = 16.0 / 9.0;
-  const int imgWidth = 384 * 2;
+  const int imgWidth = 384 * 3;
   const int imgHeight = (int)(imgWidth / aspectRatio);
 
   const double viewportHeight = 2.0;
@@ -23,30 +23,30 @@ int main(int argc, char **argv) {
   Object objects[NUM_SPHERES] = {{
                                      .type = SPHERE,
                                      .pos_center = {.x = 0, .y = 0, .z = 1.0},
-                                     .color = RED,
+                                     .albedo = {230.0 / 255.0, 41.0 / 255.0, 55.0 / 255.0},
                                      .material = DIFFUSE,
-                                     .radius = 0.5f,
+                                     .radius = 0.5,
                                  },
-                                 // {
-                                 //     .type = SPHERE,
-                                 //     .pos_center = {.x = 1000, .y = 0, .z = 0},
-                                 //     .color = YELLOW,
-                                 //     .material = METAL,
-                                 //     .radius = 400,
-                                 // },
-                                 // {
-                                 //     .type = SPHERE,
-                                 //     .pos_center = {.x = -1000, .y = 0, .z = 0},
-                                 //     .color = BLUE,
-                                 //     .material = METAL,
-                                 //     .radius = 400,
-                                 // },
+                                 {
+                                     .type = SPHERE,
+                                     .pos_center = {.x = 1.0, .y = 0, .z = 1.0},
+                                     .albedo = {253.0 / 255.0, 249.0 / 255.0, 0},
+                                     .material = METAL,
+                                     .radius = 0.5,
+                                 },
+                                 {
+                                     .type = SPHERE,
+                                     .pos_center = {.x = -1.0, .y = 0, .z = 1.0},
+                                     .albedo = {0, 121.0 / 255.0, 241.0 / 255.0},
+                                     .material = METAL,
+                                     .radius = 0.5,
+                                 },
                                  {
                                      .type = SPHERE,
                                      .pos_center = {.x = 0, .y = -100.5, .z = 1.0},
-                                     .color = GREEN,
+                                     .albedo = {0, 228.0 / 255.0, 48.0 / 255.0},
                                      .material = DIFFUSE,
-                                     .radius = 100.0f,
+                                     .radius = 100.0,
                                  }};
 
   Light lights[NUM_LIGHTS] = {{LIGHT_DIRECTIONAL, 1, {-1, 1, -1}, {0, 0, 0}, {1, 1, 1, 1}}};

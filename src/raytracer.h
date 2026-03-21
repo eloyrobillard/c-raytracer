@@ -11,11 +11,11 @@ typedef struct {
   ObjectType type;
   Vec3 pos_center; // used by spheres, squares and planes (in which case it
                    // is just any point on the plane)
-  float radius;    // used by spheres
+  double radius;   // used by spheres
   Vec3 normal;     // used by planes and squares
   Vec3 normal2;    // used by squares
   ObjectMaterial material;
-  Color color;
+  Vec3 albedo;
 } Object;
 //
 // Light type
@@ -27,7 +27,7 @@ typedef struct {
   Vector3 position;
   Vector3 target;
   Color color;
-  float attenuation;
+  double attenuation;
 } Light;
 
 typedef struct {
@@ -40,6 +40,7 @@ typedef struct {
 typedef struct {
   Vec3 point;
   Vec3 normal;
+  Object *object;
   int didHit;
 } HitInfo;
 
