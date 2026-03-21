@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
                                      .albedo = {253.0 / 255.0, 249.0 / 255.0, 0},
                                      .material = METAL,
                                      .radius = 0.5,
+                                     .fuzz = 0.3,
                                  },
                                  {
                                      .type = SPHERE,
@@ -39,6 +40,7 @@ int main(int argc, char **argv) {
                                      .albedo = {0, 121.0 / 255.0, 241.0 / 255.0},
                                      .material = METAL,
                                      .radius = 0.5,
+                                     .fuzz = 0.7,
                                  },
                                  {
                                      .type = SPHERE,

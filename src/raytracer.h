@@ -9,12 +9,13 @@ typedef enum { DIFFUSE = 0, METAL = 1 } ObjectMaterial;
 
 typedef struct {
   ObjectType type;
+  ObjectMaterial material;
   Vec3 pos_center; // used by spheres, squares and planes (in which case it
                    // is just any point on the plane)
   double radius;   // used by spheres
   Vec3 normal;     // used by planes and squares
   Vec3 normal2;    // used by squares
-  ObjectMaterial material;
+  double fuzz;     // used for a blurry metal effect
   Vec3 albedo;
 } Object;
 

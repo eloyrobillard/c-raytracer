@@ -82,16 +82,21 @@ HitInfo hit(const TRay *ray, const World *world, double tmin, double tmax) {
 }
 
 TRay scatter_lambertian(const HitInfo *hinfo) {
-  Vec3 target = random_unit_vector();
-  target = vec3_add(&target, &hinfo->normal);
-  return (TRay){hinfo->point, target};
+  Vec3 scattered = random_unit_vector();
+  scattered = vec3_add(&scattered, &hinfo->normal);
+  return (TRay){hinfo->point, scattered};
 }
 
 TRay scatter_metal(const HitInfo *hinfo, const TRay *r_in) {
   Vec3 unit_direction = normalized(&r_in->direction);
+
   Vec3 reflected = reflect(&unit_direction, &hinfo->normal);
-  TRay target = {hinfo->point, reflected};
-  return target;
+  Vec3 fuzzy = random_unit_vector();
+  fuzzy = vec3_scalar_mul(&fuzzy, hinfo->object->fuzz);
+  vec3_add_inplace(&reflected, &fuzzy);
+
+  TRay scattered = {hinfo->point, reflected};
+  return scattered;
 }
 
 int scatter(const HitInfo *rec, const TRay *ray, TRay *scattered) {
