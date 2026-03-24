@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
   Object objects[NUM_SPHERES] = {{
                                      .type = SPHERE,
                                      .pos_center = {.x = -1.0, .y = 0, .z = 1.0},
-                                     .albedo = {.8, .8, .8}, // Blue
+                                     .albedo = {.8, .8, .8}, // Whitish
                                      .material = METAL,
                                      .radius = .5,
                                      .fuzz = .3,
@@ -30,14 +30,14 @@ int main(int argc, char **argv) {
                                  {
                                      .type = SPHERE,
                                      .pos_center = {.x = 0, .y = 0, .z = 1.0},
-                                     .albedo = {.7, .3, .3}, // Red
+                                     .albedo = {.7, .3, .3}, // Redish
                                      .material = DIFFUSE,
                                      .radius = 0.5,
                                  },
                                  {
                                      .type = SPHERE,
                                      .pos_center = {.x = 1.0, .y = 0, .z = 1.0},
-                                     .albedo = {.8, .6, .2}, // Yellow
+                                     .albedo = {.8, .6, .2}, // Gold
                                      .material = METAL,
                                      .radius = .5,
                                      .fuzz = 1.0,

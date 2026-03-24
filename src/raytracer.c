@@ -65,7 +65,7 @@ HitInfo hit(const TRay *ray, const World *world, double tmin, double tmax) {
 
         rec.normal = get_sphere_normal(object, &rec.point);
         rec.normal = normalized(&rec.normal);
-        if (vec3_dot(&ray->direction, &rec.normal) > 0.0) {
+        if (vec3_dot(&ray->direction, &rec.normal) >= 0.0) {
           rec.normal = vec3_scalar_mul(&rec.normal, -1.0);
         }
 
@@ -84,7 +84,8 @@ HitInfo hit(const TRay *ray, const World *world, double tmin, double tmax) {
 TRay scatter_lambertian(const HitInfo *hinfo) {
   Vec3 scattered = random_unit_vector();
   scattered = vec3_add(&scattered, &hinfo->normal);
-  return (TRay){hinfo->point, scattered};
+  scattered = vec3_add(&scattered, &hinfo->point);
+  return (TRay){hinfo->point, vec3_difference(&scattered, &hinfo->point)};
 }
 
 TRay scatter_metal(const HitInfo *hinfo, const TRay *r_in) {
@@ -114,7 +115,7 @@ int scatter(const HitInfo *rec, const TRay *ray, TRay *scattered) {
 
 Vec3 ray_color(const TRay *ray, const World *world, int depth) {
   if (depth <= 0) {
-    return (Vec3){0.0};
+    return (Vec3){0.0, 0.0, 0.0};
   }
 
   HitInfo rec = hit(ray, world, 0.001, INFINITY);
@@ -125,6 +126,7 @@ Vec3 ray_color(const TRay *ray, const World *world, int depth) {
       Vec3 color = ray_color(&scattered, world, depth - 1);
       return (Vec3){color.x * rec.object->albedo.x, color.y * rec.object->albedo.y, color.z * rec.object->albedo.z};
     }
+
     return (Vec3){0.0, 0.0, 0.0};
   }
 
@@ -143,12 +145,11 @@ void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int i
       double r = 0.0, g = 0.0, b = 0.0;
 
       for (int s = 0; s < samplesPerPixel; s++) {
-        Vec3 direction = {camera->target.x + (random_double(0.0, 1.0) + x) / ((double)imgWidth - 1),
-                          camera->target.y + (random_double(0.0, 1.0) + y) / ((double)imgHeight - 1),
-                          camera->target.z - camera->position.z};
+        const double u = (random_double(0.0, 1.0) + x) / ((double)imgWidth - 1);
+        const double v = (random_double(0.0, 1.0) + y) / ((double)imgHeight - 1);
 
-        TRay ray = {camera->position, (Vec3){lowerLeftCorner.x + direction.x * viewportWidth,
-                                             lowerLeftCorner.y + direction.y * viewportHeight, lowerLeftCorner.z}};
+        TRay ray = {camera->position, (Vec3){lowerLeftCorner.x + u * viewportWidth,
+                                             lowerLeftCorner.y + v * viewportHeight, lowerLeftCorner.z}};
 
         Vec3 color = ray_color(&ray, world, 50);
         r += color.x;
