@@ -21,31 +21,31 @@ int main(int argc, char **argv) {
 
   Object objects[NUM_SPHERES] = {{
                                      .type = SPHERE,
+                                     .pos_center = {.x = -1.0, .y = 0, .z = 1.0},
+                                     .albedo = {.8, .8, .8}, // Blue
+                                     .material = METAL,
+                                     .radius = .5,
+                                     .fuzz = .3,
+                                 },
+                                 {
+                                     .type = SPHERE,
                                      .pos_center = {.x = 0, .y = 0, .z = 1.0},
-                                     .albedo = {230.0 / 255.0, 41.0 / 255.0, 55.0 / 255.0},
+                                     .albedo = {.7, .3, .3}, // Red
                                      .material = DIFFUSE,
                                      .radius = 0.5,
                                  },
                                  {
                                      .type = SPHERE,
                                      .pos_center = {.x = 1.0, .y = 0, .z = 1.0},
-                                     .albedo = {253.0 / 255.0, 249.0 / 255.0, 0},
+                                     .albedo = {.8, .6, .2}, // Yellow
                                      .material = METAL,
-                                     .radius = 0.5,
-                                     .fuzz = 0.3,
-                                 },
-                                 {
-                                     .type = SPHERE,
-                                     .pos_center = {.x = -1.0, .y = 0, .z = 1.0},
-                                     .albedo = {0, 121.0 / 255.0, 241.0 / 255.0},
-                                     .material = METAL,
-                                     .radius = 0.5,
-                                     .fuzz = 0.7,
+                                     .radius = .5,
+                                     .fuzz = 1.0,
                                  },
                                  {
                                      .type = SPHERE,
                                      .pos_center = {.x = 0, .y = -100.5, .z = 1.0},
-                                     .albedo = {0, 228.0 / 255.0, 48.0 / 255.0},
+                                     .albedo = {.8, .8, 0.0},
                                      .material = DIFFUSE,
                                      .radius = 100.0,
                                  }};
