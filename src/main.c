@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define NUM_SPHERES 4
+#define NUM_SPHERES 5
 
 int main(int argc, char **argv) {
   const double aspectRatio = 16.0 / 9.0;
@@ -25,7 +25,16 @@ int main(int argc, char **argv) {
                                      .albedo = {1.0, 1.0, 1.0},
                                      .material = DIELECTRIC,
                                      .radius = .5,
-                                     .refraction_idx = 1.4,
+                                     .refraction_idx = 1.5,
+                                     .fuzz = 1.0,
+                                 },
+                                 {
+                                     .type = SPHERE,
+                                     .pos_center = {.x = -1.0, .y = 0, .z = 1.0},
+                                     .albedo = {1.0, 1.0, 1.0},
+                                     .material = DIELECTRIC,
+                                     .radius = -.45,
+                                     .refraction_idx = 1.5,
                                      .fuzz = 1.0,
                                  },
                                  {

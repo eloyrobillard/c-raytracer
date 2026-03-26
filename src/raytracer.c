@@ -64,7 +64,8 @@ HitInfo hit(const TRay *ray, const World *world, double tmin, double tmax) {
         rec.point = vec3_add(&rec.point, &ray->origin);
 
         rec.normal = get_sphere_normal(object, &rec.point);
-        rec.normal = normalized(&rec.normal);
+        rec.normal = vec3_scalar_div(&rec.normal, object->radius);
+
         rec.frontFace = 1;
         if (vec3_dot(&ray->direction, &rec.normal) >= 0.0) {
           rec.frontFace = 0;
@@ -103,8 +104,9 @@ TRay scatter_metal(const HitInfo *hinfo, const TRay *r_in) {
 }
 
 Vec3 refract(const Vec3 *unit_direction, const Vec3 *unit_normal, double etai_over_etat) {
-  Vec3 r_parallel = vec3_scalar_mul(unit_normal, vec3_dot(unit_direction, unit_normal));
-  r_parallel = vec3_difference(unit_direction, &r_parallel);
+  double cos_theta = -vec3_dot(unit_direction, unit_normal);
+  Vec3 r_parallel = vec3_scalar_mul(unit_normal, cos_theta);
+  r_parallel = vec3_add(unit_direction, &r_parallel);
   r_parallel = vec3_scalar_mul(&r_parallel, etai_over_etat);
 
   Vec3 r_perp = vec3_scalar_mul(unit_normal, -sqrt(1.0 - vec3_magnitude_squared(&r_parallel)));
@@ -112,19 +114,33 @@ Vec3 refract(const Vec3 *unit_direction, const Vec3 *unit_normal, double etai_ov
   return vec3_add(&r_parallel, &r_perp);
 }
 
+double schlick(double cosine, double ref_idx) {
+  double r0 = (1 - ref_idx) / (1 + ref_idx);
+  r0 = r0 * r0;
+  return r0 + (1 - r0) * pow((1 - cosine), 5);
+}
+
 TRay scatter_dielectric(const HitInfo *hinfo, const TRay *ray) {
   double etai_over_etat = hinfo->object->refraction_idx;
-  etai_over_etat = hinfo->frontFace ? 1.0 / etai_over_etat : etai_over_etat;
+  etai_over_etat = hinfo->frontFace ? (1.0 / etai_over_etat) : etai_over_etat;
+
   Vec3 unit_direction = normalized(&ray->direction);
   Vec3 unit_normal = normalized(&hinfo->normal);
 
-  Vec3 neg_unit_dir = vec3_negate(&unit_direction);
-  double cos_theta = fmin(vec3_dot(&neg_unit_dir, &hinfo->normal), 1.0);
+  double cos_theta = fmin(-vec3_dot(&unit_direction, &unit_normal), 1.0);
   double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
-  if (etai_over_etat * sin_theta > 1.0)
-    return (TRay){hinfo->point, reflect(&unit_direction, &unit_normal)};
-  else
-    return (TRay){hinfo->point, refract(&unit_direction, &unit_normal, etai_over_etat)};
+
+  Vec3 reflected = reflect(&unit_direction, &unit_normal);
+  if (etai_over_etat * sin_theta > 1.0) {
+    return (TRay){hinfo->point, reflected};
+  }
+
+  double reflect_prob = schlick(cos_theta, etai_over_etat);
+  if (random_double(0.0, 1.0) < reflect_prob) {
+    return (TRay){hinfo->point, reflected};
+  }
+
+  return (TRay){hinfo->point, refract(&unit_direction, &unit_normal, etai_over_etat)};
 }
 
 int scatter(const HitInfo *rec, const TRay *ray, TRay *scattered) {
