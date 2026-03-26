@@ -69,7 +69,7 @@ HitInfo hit(const TRay *ray, const World *world, double tmin, double tmax) {
         rec.frontFace = 1;
         if (vec3_dot(&ray->direction, &rec.normal) >= 0.0) {
           rec.frontFace = 0;
-          rec.normal = vec3_scalar_mul(&rec.normal, -1.0);
+          rec.normal = vec3_negate(&rec.normal);
         }
 
         rec.object = object;
