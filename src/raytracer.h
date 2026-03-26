@@ -5,7 +5,7 @@
 #include "vec3.h"
 
 typedef enum { SPHERE, SQUARE, PLANE } ObjectType;
-typedef enum { DIFFUSE = 0, METAL = 1 } ObjectMaterial;
+typedef enum { DIFFUSE = 0, METAL = 1, DIELECTRIC = 2 } ObjectMaterial;
 
 typedef struct {
   ObjectType type;
@@ -17,6 +17,7 @@ typedef struct {
   Vec3 normal2;    // used by squares
   double fuzz;     // used for a blurry metal effect
   Vec3 albedo;
+  double refraction_idx;
 } Object;
 
 typedef struct {
@@ -29,6 +30,7 @@ typedef struct {
   Vec3 normal;
   Object *object;
   int didHit;
+  int frontFace;
 } HitInfo;
 
 typedef struct {

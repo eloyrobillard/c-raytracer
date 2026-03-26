@@ -22,25 +22,29 @@ int main(int argc, char **argv) {
   Object objects[NUM_SPHERES] = {{
                                      .type = SPHERE,
                                      .pos_center = {.x = -1.0, .y = 0, .z = 1.0},
-                                     .albedo = {.8, .8, .8}, // Whitish
-                                     .material = METAL,
+                                     .albedo = {1.0, 1.0, 1.0},
+                                     .material = DIELECTRIC,
                                      .radius = .5,
-                                     .fuzz = .3,
+                                     .refraction_idx = 1.4,
+                                     .fuzz = 1.0,
                                  },
                                  {
                                      .type = SPHERE,
                                      .pos_center = {.x = 0, .y = 0, .z = 1.0},
-                                     .albedo = {.7, .3, .3}, // Redish
+                                     .albedo = {1.0, 1.0, 1.0},
                                      .material = DIFFUSE,
                                      .radius = 0.5,
+                                     .refraction_idx = 1.4,
+                                     .fuzz = 1.0,
                                  },
                                  {
                                      .type = SPHERE,
                                      .pos_center = {.x = 1.0, .y = 0, .z = 1.0},
-                                     .albedo = {.8, .6, .2}, // Gold
+                                     .albedo = {.8, .6, .2},
                                      .material = METAL,
                                      .radius = .5,
-                                     .fuzz = 1.0,
+                                     .refraction_idx = 1.4,
+                                     .fuzz = 0.0,
                                  },
                                  {
                                      .type = SPHERE,
@@ -48,6 +52,8 @@ int main(int argc, char **argv) {
                                      .albedo = {.8, .8, 0.0},
                                      .material = DIFFUSE,
                                      .radius = 100.0,
+                                     .refraction_idx = 1.4,
+                                     .fuzz = 1.0,
                                  }};
 
   World world = {.objects = objects, .num_objects = NUM_SPHERES};

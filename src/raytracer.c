@@ -65,7 +65,9 @@ HitInfo hit(const TRay *ray, const World *world, double tmin, double tmax) {
 
         rec.normal = get_sphere_normal(object, &rec.point);
         rec.normal = normalized(&rec.normal);
+        rec.frontFace = 1;
         if (vec3_dot(&ray->direction, &rec.normal) >= 0.0) {
+          rec.frontFace = 0;
           rec.normal = vec3_scalar_mul(&rec.normal, -1.0);
         }
 
@@ -100,14 +102,45 @@ TRay scatter_metal(const HitInfo *hinfo, const TRay *r_in) {
   return scattered;
 }
 
+Vec3 refract(const Vec3 *unit_direction, const Vec3 *unit_normal, double etai_over_etat) {
+  Vec3 r_parallel = vec3_scalar_mul(unit_normal, vec3_dot(unit_direction, unit_normal));
+  r_parallel = vec3_difference(unit_direction, &r_parallel);
+  r_parallel = vec3_scalar_mul(&r_parallel, etai_over_etat);
+
+  Vec3 r_perp = vec3_scalar_mul(unit_normal, -sqrt(1.0 - vec3_magnitude_squared(&r_parallel)));
+
+  return vec3_add(&r_parallel, &r_perp);
+}
+
+TRay scatter_dielectric(const HitInfo *hinfo, const TRay *ray) {
+  double etai_over_etat = hinfo->object->refraction_idx;
+  etai_over_etat = hinfo->frontFace ? 1.0 / etai_over_etat : etai_over_etat;
+  Vec3 unit_direction = normalized(&ray->direction);
+  Vec3 unit_normal = normalized(&hinfo->normal);
+
+  Vec3 neg_unit_dir = vec3_negate(&unit_direction);
+  double cos_theta = fmin(vec3_dot(&neg_unit_dir, &hinfo->normal), 1.0);
+  double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+  if (etai_over_etat * sin_theta > 1.0)
+    return (TRay){hinfo->point, reflect(&unit_direction, &unit_normal)};
+  else
+    return (TRay){hinfo->point, refract(&unit_direction, &unit_normal, etai_over_etat)};
+}
+
 int scatter(const HitInfo *rec, const TRay *ray, TRay *scattered) {
-  if (rec->object->material == DIFFUSE)
+  switch (rec->object->material) {
+  case DIFFUSE:
     *scattered = scatter_lambertian(rec);
-  else {
+    break;
+  case METAL:
     *scattered = scatter_metal(rec, ray);
     if (vec3_dot(&scattered->direction, &rec->normal) <= 0.0) {
       return 0;
     }
+    break;
+  case DIELECTRIC:
+    *scattered = scatter_dielectric(rec, ray);
+    break;
   }
 
   return 1;

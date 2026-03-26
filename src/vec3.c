@@ -26,6 +26,8 @@ Vec3 vec3_difference(const Vec3 *v1, const Vec3 *v2) {
   return v;
 }
 
+Vec3 vec3_negate(const Vec3 *v) { return (Vec3){-v->x, -v->y, -v->z}; }
+
 bool vec3_equal(const Vec3 *v1, const Vec3 *v2) { return (v1->x == v2->x) && (v1->y == v2->y) && (v1->z == v2->z); }
 bool vec3_equal_with_error_margin(const Vec3 *v1, const Vec3 *v2, double margin) {
   return (absf(v1->x - v2->x) <= margin) && (absf(v1->y - v2->y) <= margin) && (absf(v1->z - v2->z) <= margin);

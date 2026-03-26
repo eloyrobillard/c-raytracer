@@ -31,6 +31,7 @@ Vec3 vec3_scalar_mul(const Vec3 *v, double scalar);
 Vec3 *vec3_scalar_mul_inplace(Vec3 *v, double scalar);
 Vec3 vec3_scalar_div(const Vec3 *v, double scalar);
 double vec3_magnitude(const Vec3 *v);
+Vec3 vec3_negate(const Vec3 *v);
 Vec3 normalized(const Vec3 *v);
 Vec3 vm_mul(Mat3 *mat, Vec3 *v);
 Vec3 *vm_mul_inplace(Mat3 *mat, Vec3 *v);
