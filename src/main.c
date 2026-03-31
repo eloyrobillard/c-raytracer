@@ -66,18 +66,15 @@ int main(int argc, char **argv) {
   World world = {.objects = objects, .num_objects = NUM_SPHERES};
 
   TCamera camera = {
-      .position = (Vec3){-2.0, 2.0, 1.0}, // Camera position
-      .target = (Vec3){0.0, 0.0, -1.0},   // Camera looking at point
-      .up = (Vec3){0.0, 1.0, 0.0}         // Camera up vector (rotation towards target)
+      .position = (Vec3){3.0, 3.0, 2.0}, // Camera position
+      .target = (Vec3){0.0, 0.0, -1.0},  // Camera looking at point
+      .up = (Vec3){0.0, 1.0, 0.0}        // Camera up vector (rotation towards target)
   };
-
-  Vec3 temp = vec3_difference(&camera.position, &camera.target);
-  double focal_length = vec3_magnitude(&temp);
 
   const double fovy = 20.0;
   const double theta = fovy / 180.0 * PI;
   const double h = tan(theta / 2);
-  const double viewportHeight = 2.0 * h * focal_length;
+  const double viewportHeight = 2.0 * h;
   const double viewportWidth = viewportHeight * aspectRatio;
 
   const int SPEED = 4;
@@ -94,7 +91,7 @@ int main(int argc, char **argv) {
 
     BeginDrawing();
 
-    trace_rays(viewportWidth, viewportHeight, imgWidth, imgHeight, &camera, &world, focal_length);
+    trace_rays(viewportWidth, viewportHeight, imgWidth, imgHeight, &camera, &world);
 
     EndDrawing();
   }

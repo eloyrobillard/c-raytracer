@@ -182,17 +182,34 @@ Vec3 ray_color(const TRay *ray, const World *world, int depth) {
   return computeBgColor(ray);
 }
 
-void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, TCamera *camera, World *world,
-                double focal_length) {
+Vec3 random_in_unit_disk() {
+  while (true) {
+    Vec3 p = (Vec3){random_double(-1, 1), random_double(-1, 1), 0};
+    if (vec3_magnitude_squared(&p) >= 1)
+      continue;
+    return p;
+  }
+}
+
+void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, TCamera *camera,
+                World *world) {
   int samplesPerPixel = 64;
 
+  double aperture = 2.0;
+  double lens_radius = aperture / 2.0;
+
   Vec3 w = vec3_difference(&camera->position, &camera->target);
+
+  double focal_length = vec3_magnitude(&w);
   w = normalized(&w);
+
   Vec3 u = vec3_cross(&camera->up, &w);
   u = normalized(&u);
+
   Vec3 v = vec3_cross(&w, &u);
-  Vec3 horizontal = vec3_scalar_mul(&u, viewportWidth);
-  Vec3 vertical = vec3_scalar_mul(&v, viewportHeight);
+
+  Vec3 horizontal = vec3_scalar_mul(&u, viewportWidth * focal_length);
+  Vec3 vertical = vec3_scalar_mul(&v, viewportHeight * focal_length);
 
   Vec3 lowerLeftCorner = {camera->position.x - horizontal.x / 2.0 - vertical.x / 2.0 - focal_length * w.x,
                           camera->position.y - horizontal.y / 2.0 - vertical.y / 2.0 - focal_length * w.y,
@@ -205,13 +222,17 @@ void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int i
       double r = 0.0, g = 0.0, b = 0.0;
 
       for (int s = 0; s < samplesPerPixel; s++) {
-        const double u = (random_double(0.0, 1.0) + x) / ((double)imgWidth - 1);
-        const double v = (random_double(0.0, 1.0) + y) / ((double)imgHeight - 1);
+        const double s = (random_double(0.0, 1.0) + x) / ((double)imgWidth - 1);
+        const double t = (random_double(0.0, 1.0) + y) / ((double)imgHeight - 1);
 
-        TRay ray = {camera->position,
-                    (Vec3){lowerLeftCorner.x + u * horizontal.x + v * vertical.x - camera->position.x,
-                           lowerLeftCorner.y + u * horizontal.y + v * vertical.y - camera->position.y,
-                           lowerLeftCorner.z + u * horizontal.z + v * vertical.z - camera->position.z}};
+        Vec3 rd = random_in_unit_disk();
+        rd = vec3_scalar_mul(&rd, lens_radius);
+        Vec3 offset = {u.x * rd.x + v.x * rd.y, u.y * rd.x + v.y * rd.y, u.z * rd.x + v.z * rd.y};
+
+        TRay ray = {vec3_add(&camera->position, &offset),
+                    (Vec3){lowerLeftCorner.x + s * horizontal.x + t * vertical.x - camera->position.x - offset.x,
+                           lowerLeftCorner.y + s * horizontal.y + t * vertical.y - camera->position.y - offset.y,
+                           lowerLeftCorner.z + s * horizontal.z + t * vertical.z - camera->position.z - offset.z}};
 
         Vec3 color = ray_color(&ray, world, 50);
         r += color.x;
