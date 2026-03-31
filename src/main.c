@@ -12,9 +12,6 @@ int main(int argc, char **argv) {
   const int imgWidth = 384 * 3;
   const int imgHeight = (int)(imgWidth / aspectRatio);
 
-  const double viewportHeight = 2.0;
-  const double viewportWidth = viewportHeight * aspectRatio;
-
   srand(time(NULL));
 
   InitWindow(imgWidth, imgHeight, "Raytracer");
@@ -71,6 +68,12 @@ int main(int argc, char **argv) {
   camera.position = (Vec3){0.0, 0.0, 0.0}; // Camera position
   camera.target = (Vec3){0.0, 0.0, 1.0};   // Camera looking at point
   camera.up = (Vec3){0.0, 1.0, 0.0};       // Camera up vector (rotation towards target)
+
+  const double fovy = 60.0;
+  const double theta = fovy / 180 * PI;
+  const double h = tan(theta / 2);
+  const double viewportHeight = 2.0 * h;
+  const double viewportWidth = viewportHeight * aspectRatio;
 
   const int SPEED = 4;
   while (!WindowShouldClose()) {
