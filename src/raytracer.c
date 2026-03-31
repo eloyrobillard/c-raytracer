@@ -182,10 +182,21 @@ Vec3 ray_color(const TRay *ray, const World *world, int depth) {
   return computeBgColor(ray);
 }
 
-void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, TCamera *camera,
-                World *world) {
-  double samplesPerPixel = 64.0;
-  Vec3 lowerLeftCorner = {-viewportWidth / 2.0, -viewportHeight / 2.0, 1.0};
+void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, TCamera *camera, World *world,
+                double focal_length) {
+  int samplesPerPixel = 64;
+
+  Vec3 w = vec3_difference(&camera->position, &camera->target);
+  w = normalized(&w);
+  Vec3 u = vec3_cross(&camera->up, &w);
+  u = normalized(&u);
+  Vec3 v = vec3_cross(&w, &u);
+  Vec3 horizontal = vec3_scalar_mul(&u, viewportWidth);
+  Vec3 vertical = vec3_scalar_mul(&v, viewportHeight);
+
+  Vec3 lowerLeftCorner = {camera->position.x - horizontal.x / 2.0 - vertical.x / 2.0 - focal_length * w.x,
+                          camera->position.y - horizontal.y / 2.0 - vertical.y / 2.0 - focal_length * w.y,
+                          camera->position.z - horizontal.z / 2.0 - vertical.z / 2.0 - focal_length * w.z};
 
   for (int y = 0; y < imgHeight; y++) {
     printf("Scan rows remaining: %d\n", imgHeight - y - 1);
@@ -197,8 +208,10 @@ void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int i
         const double u = (random_double(0.0, 1.0) + x) / ((double)imgWidth - 1);
         const double v = (random_double(0.0, 1.0) + y) / ((double)imgHeight - 1);
 
-        TRay ray = {camera->position, (Vec3){lowerLeftCorner.x + u * viewportWidth,
-                                             lowerLeftCorner.y + v * viewportHeight, lowerLeftCorner.z}};
+        TRay ray = {camera->position,
+                    (Vec3){lowerLeftCorner.x + u * horizontal.x + v * vertical.x - camera->position.x,
+                           lowerLeftCorner.y + u * horizontal.y + v * vertical.y - camera->position.y,
+                           lowerLeftCorner.z + u * horizontal.z + v * vertical.z - camera->position.z}};
 
         Vec3 color = ray_color(&ray, world, 50);
         r += color.x;
@@ -207,7 +220,7 @@ void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int i
       }
 
       // 色の合計をサンプルの数で割り、gamma = 2.0 のガンマ補正を行う
-      double scale = 1.0 / samplesPerPixel;
+      double scale = 1.0 / (double)samplesPerPixel;
       r = sqrt(scale * r);
       g = sqrt(scale * g);
       b = sqrt(scale * b);

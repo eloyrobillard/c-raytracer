@@ -39,6 +39,6 @@ typedef struct {
   Vec3 up;
 } TCamera;
 
-void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, TCamera *camera,
-                World *world);
+void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, TCamera *camera, World *world,
+                double focal_length);
 #endif

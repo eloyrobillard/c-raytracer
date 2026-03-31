@@ -1,4 +1,5 @@
 #include "raytracer.h"
+#include "vec3.h"
 #include <math.h>
 #include <raylib.h>
 #include <raymath.h>
@@ -18,7 +19,7 @@ int main(int argc, char **argv) {
 
   Object objects[NUM_SPHERES] = {{
                                      .type = SPHERE,
-                                     .pos_center = {.x = -1.0, .y = 0, .z = 1.0},
+                                     .pos_center = {.x = -1.0, .y = 0, .z = -1.0},
                                      .albedo = {1.0, 1.0, 1.0},
                                      .material = DIELECTRIC,
                                      .radius = .5,
@@ -27,7 +28,7 @@ int main(int argc, char **argv) {
                                  },
                                  {
                                      .type = SPHERE,
-                                     .pos_center = {.x = -1.0, .y = 0, .z = 1.0},
+                                     .pos_center = {.x = -1.0, .y = 0, .z = -1.0},
                                      .albedo = {1.0, 1.0, 1.0},
                                      .material = DIELECTRIC,
                                      .radius = -.45,
@@ -36,7 +37,7 @@ int main(int argc, char **argv) {
                                  },
                                  {
                                      .type = SPHERE,
-                                     .pos_center = {.x = 0, .y = 0, .z = 1.0},
+                                     .pos_center = {.x = 0, .y = 0, .z = -1.0},
                                      .albedo = {1.0, 1.0, 1.0},
                                      .material = DIFFUSE,
                                      .radius = 0.5,
@@ -45,7 +46,7 @@ int main(int argc, char **argv) {
                                  },
                                  {
                                      .type = SPHERE,
-                                     .pos_center = {.x = 1.0, .y = 0, .z = 1.0},
+                                     .pos_center = {.x = 1.0, .y = 0, .z = -1.0},
                                      .albedo = {.8, .6, .2},
                                      .material = METAL,
                                      .radius = .5,
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
                                  },
                                  {
                                      .type = SPHERE,
-                                     .pos_center = {.x = 0, .y = -100.5, .z = 1.0},
+                                     .pos_center = {.x = 0, .y = -100.5, .z = -1.0},
                                      .albedo = {.8, .8, 0.0},
                                      .material = DIFFUSE,
                                      .radius = 100.0,
@@ -64,15 +65,19 @@ int main(int argc, char **argv) {
 
   World world = {.objects = objects, .num_objects = NUM_SPHERES};
 
-  TCamera camera = {0};
-  camera.position = (Vec3){0.0, 0.0, 0.0}; // Camera position
-  camera.target = (Vec3){0.0, 0.0, 1.0};   // Camera looking at point
-  camera.up = (Vec3){0.0, 1.0, 0.0};       // Camera up vector (rotation towards target)
+  TCamera camera = {
+      .position = (Vec3){-2.0, 2.0, 1.0}, // Camera position
+      .target = (Vec3){0.0, 0.0, -1.0},   // Camera looking at point
+      .up = (Vec3){0.0, 1.0, 0.0}         // Camera up vector (rotation towards target)
+  };
 
-  const double fovy = 60.0;
-  const double theta = fovy / 180 * PI;
+  Vec3 temp = vec3_difference(&camera.position, &camera.target);
+  double focal_length = vec3_magnitude(&temp);
+
+  const double fovy = 20.0;
+  const double theta = fovy / 180.0 * PI;
   const double h = tan(theta / 2);
-  const double viewportHeight = 2.0 * h;
+  const double viewportHeight = 2.0 * h * focal_length;
   const double viewportWidth = viewportHeight * aspectRatio;
 
   const int SPEED = 4;
@@ -89,7 +94,7 @@ int main(int argc, char **argv) {
 
     BeginDrawing();
 
-    trace_rays(viewportWidth, viewportHeight, imgWidth, imgHeight, &camera, &world);
+    trace_rays(viewportWidth, viewportHeight, imgWidth, imgHeight, &camera, &world, focal_length);
 
     EndDrawing();
   }

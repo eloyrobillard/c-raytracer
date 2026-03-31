@@ -23,6 +23,7 @@ void print_vec3(Vec3 *v);
 Vec3 vec3_add(const Vec3 *v1, const Vec3 *v2);
 Vec3 *vec3_add_inplace(Vec3 *v1, const Vec3 *v2);
 Vec3 vec3_difference(const Vec3 *v1, const Vec3 *v2);
+Vec3 vec3_cross(const Vec3 *a, const Vec3 *b);
 bool vec3_equal(const Vec3 *v1, const Vec3 *v2);
 bool vec3_equal_with_error_margin(const Vec3 *v1, const Vec3 *v2, double margin);
 double vec3_dot(const Vec3 *v1, const Vec3 *v2);
