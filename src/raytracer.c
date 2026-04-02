@@ -182,25 +182,16 @@ Vec3 ray_color(const TRay *ray, const World *world, int depth) {
   return computeBgColor(ray);
 }
 
-Vec3 random_in_unit_disk() {
-  while (true) {
-    Vec3 p = (Vec3){random_double(-1, 1), random_double(-1, 1), 0};
-    if (vec3_magnitude_squared(&p) >= 1)
-      continue;
-    return p;
-  }
-}
-
 void trace_rays(double viewportWidth, double viewportHeight, int imgWidth, int imgHeight, TCamera *camera,
                 World *world) {
   int samplesPerPixel = 64;
 
-  double aperture = 2.0;
+  double aperture = 0.1;
   double lens_radius = aperture / 2.0;
 
   Vec3 w = vec3_difference(&camera->position, &camera->target);
 
-  double focal_length = vec3_magnitude(&w);
+  double focal_length = 10.0;
   w = normalized(&w);
 
   Vec3 u = vec3_cross(&camera->up, &w);

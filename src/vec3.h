@@ -20,6 +20,7 @@ typedef struct {
 } Mat3;
 
 void print_vec3(Vec3 *v);
+Vec3 vec3_mul(const Vec3 *v1, const Vec3 *v2);
 Vec3 vec3_add(const Vec3 *v1, const Vec3 *v2);
 Vec3 *vec3_add_inplace(Vec3 *v1, const Vec3 *v2);
 Vec3 vec3_difference(const Vec3 *v1, const Vec3 *v2);

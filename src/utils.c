@@ -20,9 +20,23 @@ double random_double(double min, double max) {
   return min + (max - min) * rand() / (RAND_MAX + 1.0);
 }
 
+Vec3 random_vec3(double min, double max) {
+  // [min,max) の実数乱数を返す
+  return (Vec3){random_double(min, max), random_double(min, max), random_double(min, max)};
+}
+
 Vec3 random_in_unit_sphere() {
   while (true) {
     Vec3 p = {random_double(-1.0, 1.0), random_double(-1.0, 1.0), random_double(-1.0, 1.0)};
+    if (vec3_magnitude_squared(&p) >= 1)
+      continue;
+    return p;
+  }
+}
+
+Vec3 random_in_unit_disk() {
+  while (true) {
+    Vec3 p = (Vec3){random_double(-1, 1), random_double(-1, 1), 0};
     if (vec3_magnitude_squared(&p) >= 1)
       continue;
     return p;
